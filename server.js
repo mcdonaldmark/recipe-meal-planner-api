@@ -57,6 +57,45 @@ app.get('/login', (req, res) => {
   res.redirect('/auth/google');
 });
 
+// Redirect page after login
+app.get('/redirect', (req, res) => {
+  res.send(`
+    <html>
+      <head>
+        <meta http-equiv="refresh" content="3;url=/api-docs" />
+      </head>
+      <body>
+        <h2>Login successful!</h2>
+        <p>You will be redirected to the API docs in 3 seconds...</p>
+        <p>If not redirected, <a href="/api-docs">click here</a>.</p>
+      </body>
+    </html>
+  `);
+});
+
+// Redirect page after logout
+app.get('/logout-redirect', (req, res) => {
+  res.send(`
+    <html>
+      <head>
+        <meta http-equiv="refresh" content="3;url=/api-docs" />
+      </head>
+      <body>
+        <h2>Logged out successfully!</h2>
+        <p>You will be redirected to the API docs in 3 seconds...</p>
+        <p>If not redirected, <a href="/api-docs">click here</a>.</p>
+      </body>
+    </html>
+  `);
+});
+
+// Logout route
+app.get('/logout', (req, res) => {
+  req.logout(() => {
+    res.redirect('/logout-redirect');
+  });
+});
+
 // Root route
 app.get('/', (req, res) => {
   res.send('Recipe & Meal Planner API is running');
