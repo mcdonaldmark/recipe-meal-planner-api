@@ -15,7 +15,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 /**
- * CORS (REQUIRED for Passport + Render)
+ * CORS
  */
 app.use(
   cors({
@@ -24,9 +24,6 @@ app.use(
   })
 );
 
-/**
- * Body parser
- */
 app.use(express.json());
 
 /**
@@ -44,32 +41,26 @@ app.use(
   })
 );
 
-/**
- * Passport
- */
 app.use(passport.initialize());
 app.use(passport.session());
 
-/**
- * Swagger
- */
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-/**
- * Database
- */
 connectDB();
 
 /**
- * Routes
+ * ROUTES
  */
 app.use('/auth', require('./routes/auth'));
-
-// CLEAN LOGIN URL
-app.use('/login', require('./routes/auth'));
-
 app.use('/users', require('./routes/users'));
 app.use('/recipes', require('./routes/recipes'));
+
+/**
+ * CLEAN LOGIN ROUTE
+ */
+app.get('/login', (req, res) => {
+  res.redirect('/auth/google');
+});
 
 /**
  * Root
@@ -78,16 +69,10 @@ app.get('/', (req, res) => {
   res.send('Recipe & Meal Planner API is running');
 });
 
-/**
- * 404
- */
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-/**
- * Start server
- */
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
