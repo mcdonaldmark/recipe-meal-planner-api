@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -15,7 +14,9 @@ const swaggerDocument = require('./swagger.json');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware
+/**
+ * CORS (REQUIRED for Passport + Render)
+ */
 app.use(
   cors({
     origin: true,
@@ -23,43 +24,70 @@ app.use(
   })
 );
 
+/**
+ * Body parser
+ */
 app.use(express.json());
 
+/**
+ * Sessions
+ */
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none'
+    }
   })
 );
 
+/**
+ * Passport
+ */
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Swagger docs route (AFTER app is created)
+/**
+ * Swagger
+ */
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Connect to DB
+/**
+ * Database
+ */
 connectDB();
 
-// Routes
-app.use('/users', require('./routes/users'));
-app.use('/recipes', require('./routes/recipes'));
-// #swagger.ignore = true
+/**
+ * Routes
+ */
 app.use('/auth', require('./routes/auth'));
 
+// CLEAN LOGIN URL
+app.use('/login', require('./routes/auth'));
 
-// Root route
+app.use('/users', require('./routes/users'));
+app.use('/recipes', require('./routes/recipes'));
+
+/**
+ * Root
+ */
 app.get('/', (req, res) => {
   res.send('Recipe & Meal Planner API is running');
 });
 
-// 404 handler
+/**
+ * 404
+ */
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Start server
+/**
+ * Start server
+ */
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
