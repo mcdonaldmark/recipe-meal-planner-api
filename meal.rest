@@ -1,0 +1,84 @@
+### Get all users
+GET http://localhost:3000/users
+Accept: application/json
+
+###
+
+### Create a user
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "firstName": "Mark",
+  "lastName": "McDonald",
+  "email": "mark@example.com",
+  "username": "markm",
+  "locale": "en-US"
+}
+
+###
+
+### Get user by ID
+GET http://localhost:3000/users/6979a06a28e8873d99561458
+Accept: application/json
+
+###
+
+### Update user by ID
+PUT http://localhost:3000/users/6979a06a28e8873d99561458
+Content-Type: application/json
+
+{
+  "username": "markm_updated"
+}
+
+###
+
+### Delete user by ID
+DELETE http://localhost:3000/users/6979a06a28e8873d99561458
+Accept: application/json
+
+###
+
+### Get all recipes
+GET http://localhost:3000/recipes
+Accept: application/json
+
+###
+
+### Create a recipe
+POST http://localhost:3000/recipes
+Content-Type: application/json
+
+{
+  "userId": "6979a06a28e8873d99561458",
+  "title": "Tacos",
+  "description": "A simple taco recipe",
+  "ingredients": ["tortilla", "beef", "cheese"],
+  "steps": ["Cook beef", "Warm tortilla", "Assemble tacos"],
+  "tags": ["Mexican", "Dinner"]
+}
+
+###
+
+### Get recipe by ID
+GET http://localhost:3000/recipes/6979a4221c9074f0908da0bd
+Accept: application/json
+
+###
+
+### Update recipe by ID
+PUT http://localhost:3000/recipes/6979a4221c9074f0908da0bd
+Content-Type: application/json
+
+{
+  "description": "Updated recipe description"
+}
+
+###
+
+### Delete recipe by ID
+DELETE http://localhost:3000/recipes/6979a4221c9074f0908da0bd
+Accept: application/json
+
+###
