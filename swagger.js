@@ -7,15 +7,11 @@ const doc = {
   },
   host: 'localhost:3000',
   schemes: ['http'],
-  basePath: '/',          // IMPORTANT
+  basePath: '/',
 };
 
 const outputFile = './swagger.json';
 
-/*
-  Scan ONLY the routes we want,
-  but manually define their base paths
-*/
 const endpointsFiles = [
   './routes/recipes.js',
   './routes/users.js'

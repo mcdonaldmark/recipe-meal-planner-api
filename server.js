@@ -14,10 +14,8 @@ const swaggerDocument = require('./swagger.json');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// IMPORTANT for Render HTTPS
 app.set('trust proxy', 1);
 
-// Middleware
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
@@ -36,13 +34,10 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Swagger docs route
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Connect to DB
 connectDB();
 
-// Routes
 app.use('/auth', require('./routes/auth'));
 console.log('✔️ Auth routes loaded');
 
@@ -52,12 +47,10 @@ console.log('✔️ Users routes loaded');
 app.use('/recipes', require('./routes/recipes'));
 console.log('✔️ Recipes routes loaded');
 
-// Clean login route
 app.get('/login', (req, res) => {
   res.redirect('/auth/google');
 });
 
-// Redirect page after login
 app.get('/redirect', (req, res) => {
   res.send(`
     <html>
@@ -73,7 +66,6 @@ app.get('/redirect', (req, res) => {
   `);
 });
 
-// Redirect page after logout
 app.get('/logout-redirect', (req, res) => {
   res.send(`
     <html>
@@ -89,24 +81,20 @@ app.get('/logout-redirect', (req, res) => {
   `);
 });
 
-// Logout route
 app.get('/logout', (req, res) => {
   req.logout(() => {
     res.redirect('/logout-redirect');
   });
 });
 
-// Root route
 app.get('/', (req, res) => {
   res.send('Recipe & Meal Planner API is running');
 });
 
-// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

@@ -19,7 +19,6 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// <-- ADD THIS
 exports.createUser = async (req, res) => {
   try {
     const user = new User(req.body);
