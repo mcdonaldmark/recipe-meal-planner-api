@@ -1,12 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const recipesController = require('../controllers/recipesController');
-const auth = require('../middleware/auth');
+const recipesController = require('../controllers/recipes');
+const ensureAuthenticated = require('../middleware/auth');
 
-router.get('/', auth, recipesController.getAllRecipes);
-router.get('/:id', auth, recipesController.getRecipeById);
-router.post('/', auth, recipesController.createRecipe);
-router.put('/:id', auth, recipesController.updateRecipe);
-router.delete('/:id', auth, recipesController.deleteRecipe);
+// Get all recipes (public)
+router.get('/', recipesController.getAllRecipes);
+
+// Get a single recipe by ID (public)
+router.get('/:id', recipesController.getRecipeById);
+
+// Create a new recipe (authenticated)
+router.post('/', ensureAuthenticated, recipesController.createRecipe);
+
+// Update a recipe by ID (authenticated, owner only)
+router.put('/:id', ensureAuthenticated, recipesController.updateRecipe);
+
+// Delete a recipe by ID (authenticated, owner only)
+router.delete('/:id', ensureAuthenticated, recipesController.deleteRecipe);
 
 module.exports = router;

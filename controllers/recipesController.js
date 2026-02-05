@@ -1,15 +1,17 @@
 const Recipe = require('../models/Recipe');
 
-async function getAllRecipes(req, res) {
+// Get all recipes
+const getAllRecipes = async (req, res) => {
   try {
     const recipes = await Recipe.find();
     res.json(recipes);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-}
+};
 
-async function getRecipeById(req, res) {
+// Get a recipe by ID
+const getRecipeById = async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) return res.status(404).json({ message: 'Recipe not found' });
@@ -17,17 +19,22 @@ async function getRecipeById(req, res) {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-}
+};
 
-async function createRecipe(req, res) {
+// Create a new recipe
+const createRecipe = async (req, res) => {
   try {
+    if (!req.user) return res.status(401).json({ message: 'You must be logged in' });
+
+    const { title, description, ingredients, steps, tags } = req.body;
+
     const recipe = new Recipe({
       userId: req.user.id,
-      title: req.body.title,
-      description: req.body.description,
-      ingredients: req.body.ingredients,
-      steps: req.body.steps,
-      tags: req.body.tags
+      title,
+      description,
+      ingredients,
+      steps,
+      tags
     });
 
     await recipe.save();
@@ -35,42 +42,56 @@ async function createRecipe(req, res) {
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
-}
+};
 
-async function updateRecipe(req, res) {
+// Update a recipe (owner only)
+const updateRecipe = async (req, res) => {
   try {
+    if (!req.user) return res.status(401).json({ message: 'You must be logged in' });
+
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) return res.status(404).json({ message: 'Recipe not found' });
 
+    // Check ownership
     if (recipe.userId.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not allowed' });
+      return res.status(403).json({ message: 'Not allowed to update this recipe' });
     }
 
-    const updated = await Recipe.findByIdAndUpdate(req.params.id, req.body, {
-      new: true
-    });
+    const { title, description, ingredients, steps, tags } = req.body;
 
-    res.json(updated);
+    const updateData = {};
+    if (title) updateData.title = title;
+    if (description) updateData.description = description;
+    if (ingredients) updateData.ingredients = ingredients;
+    if (steps) updateData.steps = steps;
+    if (tags) updateData.tags = tags;
+
+    const updatedRecipe = await Recipe.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    res.json(updatedRecipe);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
-}
+};
 
-async function deleteRecipe(req, res) {
+// Delete a recipe (owner only)
+const deleteRecipe = async (req, res) => {
   try {
+    if (!req.user) return res.status(401).json({ message: 'You must be logged in' });
+
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) return res.status(404).json({ message: 'Recipe not found' });
 
+    // Check ownership
     if (recipe.userId.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not allowed' });
+      return res.status(403).json({ message: 'Not allowed to delete this recipe' });
     }
 
     await Recipe.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Recipe deleted' });
+    res.json({ message: 'Recipe deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-}
+};
 
 module.exports = {
   getAllRecipes,
