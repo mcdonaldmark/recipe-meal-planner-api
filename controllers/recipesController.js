@@ -1,6 +1,5 @@
 const Recipe = require('../models/Recipe');
 
-// Get all recipes
 async function getAllRecipes(req, res) {
   try {
     const recipes = await Recipe.find();
@@ -10,7 +9,6 @@ async function getAllRecipes(req, res) {
   }
 }
 
-// Get a recipe by ID
 async function getRecipeById(req, res) {
   try {
     const recipe = await Recipe.findById(req.params.id);
@@ -21,7 +19,6 @@ async function getRecipeById(req, res) {
   }
 }
 
-// Create a new recipe
 async function createRecipe(req, res) {
   try {
     const recipe = new Recipe({
@@ -40,29 +37,18 @@ async function createRecipe(req, res) {
   }
 }
 
-// Update a recipe by ID
 async function updateRecipe(req, res) {
   try {
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) return res.status(404).json({ message: 'Recipe not found' });
 
-    // Ownership check
     if (recipe.userId.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not allowed' });
     }
 
-    // Update the recipe with provided body
-    const updated = await Recipe.findByIdAndUpdate(
-      req.params.id,
-      {
-        title: req.body.title,
-        description: req.body.description,
-        ingredients: req.body.ingredients,
-        steps: req.body.steps,
-        tags: req.body.tags
-      },
-      { new: true }
-    );
+    const updated = await Recipe.findByIdAndUpdate(req.params.id, req.body, {
+      new: true
+    });
 
     res.json(updated);
   } catch (err) {
@@ -70,19 +56,17 @@ async function updateRecipe(req, res) {
   }
 }
 
-// Delete a recipe by ID
 async function deleteRecipe(req, res) {
   try {
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) return res.status(404).json({ message: 'Recipe not found' });
 
-    // Ownership check
     if (recipe.userId.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not allowed' });
     }
 
     await Recipe.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Recipe deleted successfully' });
+    res.json({ message: 'Recipe deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
