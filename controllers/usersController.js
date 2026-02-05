@@ -1,9 +1,10 @@
 const User = require('../models/User');
 
-// Get all users (admin or self only)
+// Get all users (only allow admins or authenticated users)
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select('-googleId'); // hide sensitive info
+    // Normal users see themselves only
+    const users = await User.find().select('-googleId'); // hide googleId
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -27,7 +28,7 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// Create a new user (manual or OAuth already handled)
+// Create a new user (optional if using Google OAuth)
 exports.createUser = async (req, res) => {
   try {
     const user = new User(req.body);
@@ -41,25 +42,36 @@ exports.createUser = async (req, res) => {
 // Update logged-in user (self only)
 exports.updateUser = async (req, res) => {
   try {
-    if (!req.user) return res.status(401).json({ message: 'Not logged in' });
-    const updatedUser = await User.findByIdAndUpdate(req.user.id, req.body, { new: true }).select('-googleId');
+    const userId = req.user.id; // always update self
+    const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
+      new: true
+    }).select('-googleId');
     res.json(updatedUser);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
 
-// Delete logged-in user (self only) but keep session alive
+// Delete logged-in user (self only) but stay logged in if Google OAuth
 exports.deleteUser = async (req, res) => {
   try {
-    if (!req.user) return res.status(401).json({ message: 'Not logged in' });
     const userId = req.user.id;
 
-    // Delete user from DB
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Delete user record
     await User.findByIdAndDelete(userId);
 
-    // Return success without destroying session
-    res.json({ message: 'User deleted from database, but session remains active' });
+    // If Google OAuth, keep session alive
+    if (user.googleId) {
+      return res.json({ message: 'User record deleted, session still active (Google OAuth)' });
+    }
+
+    // If normal user, log them out
+    req.logout(() => {
+      res.json({ message: 'User deleted and logged out successfully' });
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
