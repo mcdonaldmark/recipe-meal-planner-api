@@ -1,6 +1,5 @@
 const Recipe = require('../models/Recipe');
 
-// Get all recipes
 const getAllRecipes = async (req, res) => {
   try {
     const recipes = await Recipe.find();
@@ -10,7 +9,6 @@ const getAllRecipes = async (req, res) => {
   }
 };
 
-// Get a recipe by ID
 const getRecipeById = async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
@@ -21,7 +19,6 @@ const getRecipeById = async (req, res) => {
   }
 };
 
-// Create a new recipe
 const createRecipe = async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ message: 'You must be logged in' });
@@ -44,7 +41,6 @@ const createRecipe = async (req, res) => {
   }
 };
 
-// Update a recipe (owner only)
 const updateRecipe = async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ message: 'You must be logged in' });
@@ -52,7 +48,6 @@ const updateRecipe = async (req, res) => {
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) return res.status(404).json({ message: 'Recipe not found' });
 
-    // Check ownership
     if (recipe.userId.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not allowed to update this recipe' });
     }
@@ -73,7 +68,6 @@ const updateRecipe = async (req, res) => {
   }
 };
 
-// Delete a recipe (owner only)
 const deleteRecipe = async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ message: 'You must be logged in' });
@@ -81,7 +75,6 @@ const deleteRecipe = async (req, res) => {
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) return res.status(404).json({ message: 'Recipe not found' });
 
-    // Check ownership
     if (recipe.userId.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not allowed to delete this recipe' });
     }

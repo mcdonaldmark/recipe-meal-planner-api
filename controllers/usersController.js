@@ -1,22 +1,19 @@
 const User = require('../models/User');
 
-// Get all users (authenticated)
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select('-googleId'); // hide googleId
+    const users = await User.find().select('-googleId');
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// Get current logged-in user
 exports.getCurrentUser = (req, res) => {
   if (!req.user) return res.status(401).json({ message: 'Not logged in' });
   res.json(req.user);
 };
 
-// Get user by ID
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-googleId');
@@ -27,7 +24,6 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// Create a new user (optional if using Google OAuth)
 exports.createUser = async (req, res) => {
   try {
     const user = new User(req.body);
@@ -38,14 +34,12 @@ exports.createUser = async (req, res) => {
   }
 };
 
-// Update user
 exports.updateUser = async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ message: 'You must be logged in' });
 
     const targetUserId = req.params.id;
 
-    // If Google OAuth user, skip ownership check
     if (!req.user.googleId && req.user.id !== targetUserId) {
       return res.status(403).json({ message: 'Not allowed to update this user' });
     }
@@ -62,7 +56,6 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// Delete user
 exports.deleteUser = async (req, res) => {
   try {
     if (!req.user) return res.status(401).json({ message: 'You must be logged in' });
@@ -71,7 +64,6 @@ exports.deleteUser = async (req, res) => {
     const user = await User.findById(targetUserId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    // If normal user, check ownership
     if (!req.user.googleId && req.user.id !== targetUserId) {
       return res.status(403).json({ message: 'Not allowed to delete this user' });
     }

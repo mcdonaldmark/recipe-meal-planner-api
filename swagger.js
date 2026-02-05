@@ -17,7 +17,6 @@ const doc = {
     }
   },
   paths: {
-    // Users endpoints
     "/users": {
       "get": {
         "tags": ["Users"],
