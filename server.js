@@ -5,7 +5,6 @@ require('dotenv').config();
 const connectDB = require('./data/database');
 const passport = require('passport');
 const session = require('express-session');
-const MongoStore = require('connect-mongo'); // updated import for v4+
 
 require('./config/passport');
 
@@ -15,29 +14,22 @@ const swaggerDocument = require('./swagger.json');
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.set('trust proxy', 1); // for secure cookies behind proxies
+// Connect to MongoDB
+connectDB();
 
+// Middleware
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
-// Connect to MongoDB first
-connectDB();
-
-// Session middleware with MongoDB store
+// Session setup (in-memory for now, works for single server)
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI, // your MongoDB URI
-      ttl: 14 * 24 * 60 * 60, // 14 days
-      autoRemove: 'native', // let MongoDB handle expired sessions
-    }),
     cookie: {
-      secure: process.env.NODE_ENV === 'production', // only use HTTPS in production
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      secure: false, // set to true if using HTTPS in production
       sameSite: 'lax',
     },
   })
@@ -46,7 +38,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Swagger docs
+// Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Routes
@@ -59,12 +51,12 @@ console.log('✔️ Users routes loaded');
 app.use('/recipes', require('./routes/recipes'));
 console.log('✔️ Recipes routes loaded');
 
-// Login redirect
+// Login redirect (starts OAuth)
 app.get('/login', (req, res) => {
   res.redirect('/auth/google');
 });
 
-// Post-login redirect
+// Redirect after successful OAuth login
 app.get('/redirect', (req, res) => {
   res.send(`
     <html>
@@ -97,23 +89,23 @@ app.get('/logout-redirect', (req, res) => {
 });
 
 // Logout route
-app.get('/logout', (req, res, next) => {
-  req.logout(err => {
-    if (err) return next(err);
+app.get('/logout', (req, res) => {
+  req.logout(() => {
     res.redirect('/logout-redirect');
   });
 });
 
-// Health check
+// Base route
 app.get('/', (req, res) => {
   res.send('Recipe & Meal Planner API is running');
 });
 
-// 404 fallback
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
+// Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

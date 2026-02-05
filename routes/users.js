@@ -1,14 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const usersController = require('../controllers/usersController');
-const auth = require('../middleware/auth');
+const ensureAuthenticated = require('../middleware/auth');
 
-// Users CRUD
-router.get('/', auth, usersController.getAllUsers); // get all users
-router.get('/currentUser', auth, usersController.getCurrentUser); // get logged-in user
-router.get('/:id', auth, usersController.getUserById); // get specific user
-router.post('/', auth, usersController.createUser); // create user manually
-router.put('/:id', auth, usersController.updateUser); // update self
-router.delete('/:id', auth, usersController.deleteUser); // delete self
+// Get all users (authenticated)
+router.get('/', ensureAuthenticated, usersController.getAllUsers);
+
+// Get a single user by ID (authenticated)
+router.get('/:id', ensureAuthenticated, usersController.getUserById);
+
+// Create a new user (optional, usually handled by Google OAuth)
+router.post('/', usersController.createUser);
+
+// Update logged-in user (self only)
+router.put('/:id', ensureAuthenticated, usersController.updateUser);
+
+// Delete logged-in user (self only, but keeps session alive)
+router.delete('/:id', ensureAuthenticated, usersController.deleteUser);
 
 module.exports = router;
