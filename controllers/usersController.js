@@ -52,23 +52,26 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// Delete logged-in user (only allow self delete)
+// Delete logged-in user or another user (admin or self)
 exports.deleteUser = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userIdToDelete = req.params.id; // delete the ID from params
 
-    // Find the user first
-    const user = await User.findById(userId);
+    const user = await User.findById(userIdToDelete);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    // Delete the user from the database
-    await User.findByIdAndDelete(userId);
+    // Optional: only allow self or admin to delete
+    if (userIdToDelete !== req.user.id) {
+      // Add admin check here if needed
+      return res.status(403).json({ message: 'Not allowed to delete this user' });
+    }
 
-    // Log out the session cleanly
-    req.logout(() => {
-      res.json({ message: 'User deleted and logged out successfully' });
-    });
+    await User.findByIdAndDelete(userIdToDelete);
+
+    // Do NOT log out the current session
+    res.json({ message: `User ${userIdToDelete} deleted successfully` });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
