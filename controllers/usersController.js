@@ -1,17 +1,26 @@
 const User = require('../models/User');
 
+// Get all users (only allow admins or authenticated users)
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    // Optionally, you can filter so normal users only see themselves
+    const users = await User.find().select('-googleId'); // hide googleId
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
+// Get current logged-in user
+exports.getCurrentUser = (req, res) => {
+  if (!req.user) return res.status(401).json({ message: 'Not logged in' });
+  res.json(req.user);
+};
+
+// Get user by ID
 exports.getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).select('-googleId');
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (err) {
@@ -19,6 +28,7 @@ exports.getUserById = async (req, res) => {
   }
 };
 
+// Create a new user (optional if using Google OAuth)
 exports.createUser = async (req, res) => {
   try {
     const user = new User(req.body);
@@ -29,22 +39,24 @@ exports.createUser = async (req, res) => {
   }
 };
 
+// Update logged-in user (only allow self update)
 exports.updateUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    const userId = req.user.id; // always update self
+    const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
       new: true
-    });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json(user);
+    }).select('-googleId');
+    res.json(updatedUser);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
 
+// Delete logged-in user (only allow self delete)
 exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const userId = req.user.id;
+    await User.findByIdAndDelete(userId);
     res.json({ message: 'User deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });

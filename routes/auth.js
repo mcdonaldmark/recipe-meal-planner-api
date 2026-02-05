@@ -2,16 +2,15 @@ const express = require('express');
 const passport = require('passport');
 const router = express.Router();
 
-router.get(
-  '/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
-);
+// Start Google OAuth login
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
+// OAuth callback
 router.get(
   '/google/callback',
   passport.authenticate('google', { failureRedirect: '/auth/failure' }),
   (req, res) => {
-    res.redirect('/redirect');
+    res.redirect('/redirect'); // redirect after login
   }
 );
 
@@ -21,10 +20,11 @@ router.get('/failure', (req, res) => {
 
 router.get('/logout', (req, res) => {
   req.logout(() => {
-    res.json({ message: 'Logged out' });
+    res.redirect('/logout-redirect');
   });
 });
 
+// Optional route to get current user
 router.get('/currentUser', (req, res) => {
   if (!req.user) return res.status(401).json({ message: 'Not logged in' });
   res.json(req.user);
