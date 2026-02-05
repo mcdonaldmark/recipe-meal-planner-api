@@ -1,9 +1,8 @@
 const User = require('../models/User');
 
-// Get all users (only allow admins or authenticated users)
-exports.getAllUsers = async (req, res) => {
+// Get all users (authenticated)
+const getAllUsers = async (req, res) => {
   try {
-    // Normal users see themselves only
     const users = await User.find().select('-googleId'); // hide googleId
     res.json(users);
   } catch (err) {
@@ -11,14 +10,8 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// Get current logged-in user
-exports.getCurrentUser = (req, res) => {
-  if (!req.user) return res.status(401).json({ message: 'Not logged in' });
-  res.json(req.user);
-};
-
 // Get user by ID
-exports.getUserById = async (req, res) => {
+const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-googleId');
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -28,8 +21,8 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// Create a new user (optional if using Google OAuth)
-exports.createUser = async (req, res) => {
+// Create a new user (usually via OAuth)
+const createUser = async (req, res) => {
   try {
     const user = new User(req.body);
     await user.save();
@@ -40,32 +33,46 @@ exports.createUser = async (req, res) => {
 };
 
 // Update logged-in user (self only)
-exports.updateUser = async (req, res) => {
+const updateUser = async (req, res) => {
   try {
-    const userId = req.user.id; // always update self
-    const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
-      new: true
-    }).select('-googleId');
+    if (!req.user) return res.status(401).json({ message: 'You must be logged in' });
+
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Only allow self-update
+    if (user.id !== req.user.id) {
+      return res.status(403).json({ message: 'Not allowed to update this user' });
+    }
+
+    const { firstName, lastName, email, username, locale } = req.body;
+    const updateData = { firstName, lastName, email, username, locale };
+
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, updateData, { new: true }).select('-googleId');
     res.json(updatedUser);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
 
-// Delete logged-in user (self only) but stay logged in if Google OAuth
-exports.deleteUser = async (req, res) => {
+// Delete logged-in user (self only)
+const deleteUser = async (req, res) => {
   try {
-    const userId = req.user.id;
+    if (!req.user) return res.status(401).json({ message: 'You must be logged in' });
 
-    const user = await User.findById(userId);
+    const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    // Delete user record
-    await User.findByIdAndDelete(userId);
+    // Only allow self-delete
+    if (user.id !== req.user.id) {
+      return res.status(403).json({ message: 'Not allowed to delete this user' });
+    }
 
-    // If Google OAuth, keep session alive
+    await User.findByIdAndDelete(req.params.id);
+
+    // If Google OAuth user, keep session alive
     if (user.googleId) {
-      return res.json({ message: 'User record deleted, session still active (Google OAuth)' });
+      return res.json({ message: 'User deleted, session still active (Google OAuth)' });
     }
 
     // If normal user, log them out
@@ -75,4 +82,12 @@ exports.deleteUser = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+};
+
+module.exports = {
+  getAllUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser
 };

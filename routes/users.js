@@ -9,13 +9,13 @@ router.get('/', ensureAuthenticated, usersController.getAllUsers);
 // Get a single user by ID (authenticated)
 router.get('/:id', ensureAuthenticated, usersController.getUserById);
 
-// Create a new user (optional, usually handled by Google OAuth)
-router.post('/', usersController.createUser);
+// Create a new user (usually via OAuth)
+router.post('/', ensureAuthenticated, usersController.createUser);
 
-// Update logged-in user (self only)
+// Update a user by ID (authenticated, self only)
 router.put('/:id', ensureAuthenticated, usersController.updateUser);
 
-// Delete logged-in user (self only, but keeps session alive)
+// Delete a user by ID (authenticated, self only)
 router.delete('/:id', ensureAuthenticated, usersController.deleteUser);
 
 module.exports = router;
