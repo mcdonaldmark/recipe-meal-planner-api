@@ -5,6 +5,7 @@ require('dotenv').config();
 const connectDB = require('./data/database');
 const passport = require('passport');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 
 require('./config/passport');
 
@@ -14,30 +15,37 @@ const swaggerDocument = require('./swagger.json');
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.set('trust proxy', 1);
+connectDB();
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
+// Session with MongoDB store to persist sessions in production
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      collectionName: 'sessions',
+    }),
     cookie: {
-      secure: true,
-      sameSite: 'none'
-    }
+      secure: process.env.NODE_ENV === 'production', // true in prod, false in dev
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      sameSite: 'lax',
+    },
   })
 );
 
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Swagger docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-connectDB();
-
+// Routes
 app.use('/auth', require('./routes/auth'));
 console.log('✔️ Auth routes loaded');
 
@@ -47,50 +55,11 @@ console.log('✔️ Users routes loaded');
 app.use('/recipes', require('./routes/recipes'));
 console.log('✔️ Recipes routes loaded');
 
-app.get('/login', (req, res) => {
-  res.redirect('/auth/google');
-});
-
-app.get('/redirect', (req, res) => {
-  res.send(`
-    <html>
-      <head>
-        <meta http-equiv="refresh" content="3;url=/api-docs" />
-      </head>
-      <body>
-        <h2>Login successful!</h2>
-        <p>You will be redirected to the API docs in 3 seconds...</p>
-        <p>If not redirected, <a href="/api-docs">click here</a>.</p>
-      </body>
-    </html>
-  `);
-});
-
-app.get('/logout-redirect', (req, res) => {
-  res.send(`
-    <html>
-      <head>
-        <meta http-equiv="refresh" content="3;url=/api-docs" />
-      </head>
-      <body>
-        <h2>Logged out successfully!</h2>
-        <p>You will be redirected to the API docs in 3 seconds...</p>
-        <p>If not redirected, <a href="/api-docs">click here</a>.</p>
-      </body>
-    </html>
-  `);
-});
-
-app.get('/logout', (req, res) => {
-  req.logout(() => {
-    res.redirect('/logout-redirect');
-  });
-});
-
 app.get('/', (req, res) => {
   res.send('Recipe & Meal Planner API is running');
 });
 
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });

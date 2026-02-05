@@ -8,7 +8,10 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 // OAuth callback
 router.get(
   '/google/callback',
-  passport.authenticate('google', { failureRedirect: '/auth/failure' }),
+  passport.authenticate('google', {
+    failureRedirect: '/auth/failure',
+    session: true, // explicitly enable session
+  }),
   (req, res) => {
     res.redirect('/redirect'); // redirect after login
   }
@@ -18,8 +21,10 @@ router.get('/failure', (req, res) => {
   res.status(401).json({ message: 'Failed to authenticate' });
 });
 
-router.get('/logout', (req, res) => {
-  req.logout(() => {
+// Logout
+router.get('/logout', (req, res, next) => {
+  req.logout(err => {
+    if (err) return next(err);
     res.redirect('/logout-redirect');
   });
 });
