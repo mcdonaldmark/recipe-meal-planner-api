@@ -32,18 +32,9 @@
               "properties": {
                 "title": { "example": "Spaghetti" },
                 "description": { "example": "Classic pasta dish" },
-                "ingredients": {
-                  "type": "array",
-                  "items": { "example": "Pasta" }
-                },
-                "steps": {
-                  "type": "array",
-                  "items": { "example": "Boil water" }
-                },
-                "tags": {
-                  "type": "array",
-                  "items": { "example": "Italian" }
-                }
+                "ingredients": { "type": "array", "items": { "example": "Pasta" } },
+                "steps": { "type": "array", "items": { "example": "Boil water" } },
+                "tags": { "type": "array", "items": { "example": "Italian" } }
               }
             }
           }
@@ -60,12 +51,7 @@
         "tags": ["Recipes"],
         "description": "Get a recipe by ID",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
+          { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "OK" },
@@ -78,11 +64,21 @@
         "tags": ["Recipes"],
         "description": "Update a recipe by ID",
         "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
           {
-            "name": "id",
-            "in": "path",
+            "name": "body",
+            "in": "body",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": { "example": "Updated Recipe Title" },
+                "description": { "example": "Updated description" },
+                "ingredients": { "type": "array", "items": { "example": "Ingredient 1" } },
+                "steps": { "type": "array", "items": { "example": "Step 1" } },
+                "tags": { "type": "array", "items": { "example": "Italian" } }
+              }
+            }
           }
         ],
         "responses": {
@@ -97,12 +93,7 @@
         "tags": ["Recipes"],
         "description": "Delete a recipe by ID",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
+          { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "OK" },
@@ -152,12 +143,7 @@
         "tags": ["Users"],
         "description": "Get a user by ID",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
+          { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "OK" },
@@ -169,11 +155,21 @@
         "tags": ["Users"],
         "description": "Update a user by ID",
         "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
           {
-            "name": "id",
-            "in": "path",
+            "name": "body",
+            "in": "body",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": { "example": "Mark" },
+                "lastName": { "example": "McDonald" },
+                "email": { "example": "mark@example.com" },
+                "username": { "example": "markm" },
+                "locale": { "example": "en-US" }
+              }
+            }
           }
         ],
         "responses": {
@@ -186,12 +182,7 @@
         "tags": ["Users"],
         "description": "Delete a user by ID",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
+          { "name": "id", "in": "path", "required": true, "type": "string" }
         ],
         "responses": {
           "200": { "description": "OK" },
