@@ -4,7 +4,6 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const app = require('../server');
 const User = require('../models/User');
 
-// Mock authentication middleware to bypass auth in tests
 jest.mock('../middleware/auth', () => (req, res, next) => next());
 
 let mongoServer;

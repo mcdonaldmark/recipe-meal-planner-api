@@ -1,10 +1,9 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const app = require('../server'); // make sure this exports the Express app
+const app = require('../server');
 const Recipe = require('../models/Recipe');
 
-// Mock authentication middleware to bypass auth in tests
 jest.mock('../middleware/auth', () => (req, res, next) => next());
 
 let mongoServer;
@@ -15,7 +14,6 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-  // Clear all collections after each test
   const collections = mongoose.connection.collections;
   for (const key in collections) {
     await collections[key].deleteMany();
@@ -40,7 +38,7 @@ describe('GET /recipes endpoints', () => {
       title: 'Test Recipe',
       ingredients: ['Ingredient 1'],
       steps: ['Step 1'],
-      userId: new mongoose.Types.ObjectId(), // required field
+      userId: new mongoose.Types.ObjectId(),
     });
 
     const res = await request(app).get('/recipes');
