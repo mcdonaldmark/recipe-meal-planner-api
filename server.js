@@ -6,7 +6,7 @@ const connectDB = require('./data/database');
 const passport = require('passport');
 const session = require('express-session');
 
-//require('./config/passport');
+require('./config/passport');
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
