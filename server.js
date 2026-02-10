@@ -6,7 +6,7 @@ const connectDB = require('./data/database');
 const passport = require('passport');
 const session = require('express-session');
 
-require('./config/passport');
+//require('./config/passport');
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
@@ -45,6 +45,10 @@ console.log('✔️ Users routes loaded');
 
 app.use('/recipes', require('./routes/recipes'));
 console.log('✔️ Recipes routes loaded');
+
+app.use("/tags", require("./routes/tags"));
+
+app.use("/mealplans", require("./routes/mealPlan"));
 
 app.get('/login', (req, res) => {
   res.redirect('/auth/google');
