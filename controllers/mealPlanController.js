@@ -1,21 +1,23 @@
+// controllers/mealPlanController.js
 const MealPlan = require("../models/MealPlan");
 
 // GET meal plan by ID
 const getMealPlanById = async (req, res) => {
   try {
     const mealPlan = await MealPlan.findById(req.params.id)
-      .populate({ path: "userId", select: "firstName lastName email username locale -_id" })
       .populate({ path: "recipeId", select: "title description -_id" });
 
     if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
 
     // Ensure the current user owns the meal plan
-    if (mealPlan.userId._id.toString() !== req.user.id) {
+    const mealPlanUserId = mealPlan.userId._id ? mealPlan.userId._id.toString() : mealPlan.userId.toString();
+    if (mealPlanUserId !== req.user.id) {
       return res.status(403).json({ message: "Not allowed" });
     }
 
     res.json(mealPlan);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -28,6 +30,7 @@ const getMealPlans = async (req, res) => {
 
     res.json(mealPlans);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -43,6 +46,7 @@ const createMealPlan = async (req, res) => {
     const savedMealPlan = await newMealPlan.save();
     res.status(201).json(savedMealPlan);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -53,7 +57,8 @@ const updateMealPlan = async (req, res) => {
     const mealPlan = await MealPlan.findById(req.params.id);
     if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
 
-    if (mealPlan.userId.toString() !== req.user.id) {
+    const mealPlanUserId = mealPlan.userId._id ? mealPlan.userId._id.toString() : mealPlan.userId.toString();
+    if (mealPlanUserId !== req.user.id) {
       return res.status(403).json({ message: "Not allowed" });
     }
 
@@ -61,6 +66,7 @@ const updateMealPlan = async (req, res) => {
     const updatedMealPlan = await mealPlan.save();
     res.json(updatedMealPlan);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -71,13 +77,15 @@ const deleteMealPlan = async (req, res) => {
     const mealPlan = await MealPlan.findById(req.params.id);
     if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
 
-    if (mealPlan.userId.toString() !== req.user.id) {
+    const mealPlanUserId = mealPlan.userId._id ? mealPlan.userId._id.toString() : mealPlan.userId.toString();
+    if (mealPlanUserId !== req.user.id) {
       return res.status(403).json({ message: "Not allowed" });
     }
 
     await mealPlan.deleteOne();
     res.json({ message: "MealPlan deleted" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
