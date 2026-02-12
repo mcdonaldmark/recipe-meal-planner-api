@@ -49,6 +49,10 @@ console.log('✔️ Users routes loaded');
 app.use('/recipes', require('./routes/recipes'));
 console.log('✔️ Recipes routes loaded');
 
+app.use("/tags", require("./routes/tags"));
+
+app.use("/mealplans", require("./routes/mealPlan"));
+
 // Auth redirect routes
 app.get('/login', (req, res) => {
   res.redirect('/auth/google');

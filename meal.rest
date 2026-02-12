@@ -44,7 +44,7 @@ Content-Type: application/json
   "description": "A simple taco recipe",
   "ingredients": ["tortilla", "beef", "cheese"],
   "steps": ["Cook beef", "Warm tortilla", "Assemble tacos"],
-  "tags": ["Mexican", "Dinner"]
+  "tagsId": ["Mexican", "Dinner"]
 }
 
 ### Get recipe by ID
@@ -61,4 +61,64 @@ Content-Type: application/json
 
 ### Delete recipe by ID
 DELETE http://localhost:3000/recipes/6979a4221c9074f0908da0bd
+Accept: application/json
+
+### Get All
+GET http://localhost:3000/tags
+Accept: application/json
+
+### Create Tag
+POST http://localhost:3000/tags
+Content-Type: application/json
+
+{
+  "name": "Meal Prep 2",
+  "description": "Meals prepared in advance"
+}
+
+### Get by ID
+GET http://localhost:3000/tags/698a8aaa1e1de2a1371c560c
+Accept: application/json
+
+### Update tag by ID
+PUT http://localhost:3000/tags/698a8aaa1e1de2a1371c560c
+Content-Type: application/json
+
+{
+  "description": "Updated tag description 2"
+}
+
+### Delete tag by ID
+DELETE http://localhost:3000/tags/698a8aaa1e1de2a1371c560c
+Accept: application/json
+
+### Get all meal plans
+GET http://localhost:3000/mealplans
+Accept: application/json
+
+### Create a meal plans
+POST http://localhost:3000/mealplans
+Content-Type: application/json
+
+{
+  "userId": "6987c0457077c12fdaa83211",
+  "recipeId": "6987c1597077c12fdaa8321d",
+  "mealType": "breakfast",
+  "notes": "Meal Plan Name",
+}
+
+### Get meal plan by ID
+GET http://localhost:3000/mealplans/698a8d82fc2336af78d83a36
+Accept: application/json
+
+### Update meal plan by ID
+PUT http://localhost:3000/mealplans/698a8d82fc2336af78d83a36
+Content-Type: application/json
+
+{
+  "notes": "Updated Meal Plan Name",
+}
+
+### Delete meal plan by ID
+DELETE http://localhost:3000/mealplans/698a8d82fc2336af78d83a36
 Accept: application/json
