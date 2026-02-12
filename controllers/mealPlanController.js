@@ -1,46 +1,16 @@
 const MealPlan = require("../models/MealPlan");
 
-const getAllMealPlans = async (req, res) => {
-  try {
-    if (!req.user)
-      return res.status(401).json({ message: "You must be logged in" });
-
-    const mealPlans = await MealPlan.find()
-      .populate({
-        path: "userId",
-        select: "firstName lastName email username locale -_id",
-      })
-      .populate({
-        path: "recipeId",
-        select: "title description -_id",
-      });
-
-    res.json(mealPlans);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
+// GET meal plan by ID
 const getMealPlanById = async (req, res) => {
   try {
-    if (!req.user)
-      return res.status(401).json({ message: "You must be logged in" });
-
     const mealPlan = await MealPlan.findById(req.params.id)
-      .populate({
-        path: "userId",
-        select: "firstName lastName email username locale -_id",
-      })
-      .populate({
-        path: "recipeId",
-        select: "title description -_id",
-      });
+      .populate({ path: "userId", select: "firstName lastName email username locale -_id" })
+      .populate({ path: "recipeId", select: "title description -_id" });
 
-    if (!mealPlan) {
-      return res.status(404).json({ message: "MealPlan not found" });
-    }
+    if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
 
-    if (mealPlan.userId.toString() !== req.user) {
+    // Ensure the current user owns the meal plan
+    if (mealPlan.userId._id.toString() !== req.user.id) {
       return res.status(403).json({ message: "Not allowed" });
     }
 
@@ -50,84 +20,71 @@ const getMealPlanById = async (req, res) => {
   }
 };
 
+// GET all meal plans for current user
+const getMealPlans = async (req, res) => {
+  try {
+    const mealPlans = await MealPlan.find({ userId: req.user.id })
+      .populate({ path: "recipeId", select: "title description -_id" });
+
+    res.json(mealPlans);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// CREATE a new meal plan
 const createMealPlan = async (req, res) => {
   try {
-    if (!req.user)
-      return res.status(401).json({ message: "You must be logged in" });
-
-    const { recipeId, date, mealType, notes } = req.body;
-
-    const mealPlan = new MealPlan({
-      userId: req.user.id,
-      recipeId,
-      date,
-      mealType,
-      notes,
+    const newMealPlan = new MealPlan({
+      ...req.body,
+      userId: req.user.id, // always set from logged-in user
     });
 
-    await mealPlan.save();
-    res.status(201).json(mealPlan);
+    const savedMealPlan = await newMealPlan.save();
+    res.status(201).json(savedMealPlan);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
+// UPDATE a meal plan by ID
 const updateMealPlan = async (req, res) => {
   try {
-    if (!req.user)
-      return res.status(401).json({ message: "You must be logged in" });
-
     const mealPlan = await MealPlan.findById(req.params.id);
-    if (!mealPlan)
-      return res.status(404).json({ message: "MealPlan not found" });
+    if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
 
     if (mealPlan.userId.toString() !== req.user.id) {
       return res.status(403).json({ message: "Not allowed" });
     }
 
-    const { recipeId, date, mealType, notes } = req.body;
-
-    const updateData = {};
-    if (recipeId) updateData.recipeId = recipeId;
-    if (date) updateData.date = date;
-    if (mealType) updateData.mealType = mealType;
-    if (notes) updateData.notes = notes;
-
-    const updatedMealPlan = await MealPlan.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true },
-    );
-
+    Object.assign(mealPlan, req.body);
+    const updatedMealPlan = await mealPlan.save();
     res.json(updatedMealPlan);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
+// DELETE a meal plan by ID
 const deleteMealPlan = async (req, res) => {
   try {
-    if (!req.user)
-      return res.status(401).json({ message: "You must be logged in" });
-
     const mealPlan = await MealPlan.findById(req.params.id);
-    if (!mealPlan)
-      return res.status(404).json({ message: "MealPlan not found" });
+    if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
 
     if (mealPlan.userId.toString() !== req.user.id) {
       return res.status(403).json({ message: "Not allowed" });
     }
 
-    await MealPlan.findByIdAndDelete(req.params.id);
-    res.json({ message: "MealPlan deleted successfully" });
+    await mealPlan.deleteOne();
+    res.json({ message: "MealPlan deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
 module.exports = {
-  getAllMealPlans,
   getMealPlanById,
+  getMealPlans,
   createMealPlan,
   updateMealPlan,
   deleteMealPlan,

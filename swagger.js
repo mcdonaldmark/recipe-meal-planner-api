@@ -17,27 +17,27 @@ const doc = {
     }
   },
   paths: {
-    // USERS ENDPOINTS (unchanged, same as your code)
+    // USERS and RECIPES endpoints remain unchanged
     "/users": { /* ... your existing users endpoints ... */ },
-    "/users/{id}": { /* ... your existing users/{id} endpoints ... */ },
+    "/users/{id}": { /* ... */ },
+    "/recipes": { /* ... */ },
+    "/recipes/{id}": { /* ... */ },
 
-    // RECIPES ENDPOINTS (unchanged)
-    "/recipes": { /* ... your existing recipes endpoints ... */ },
-    "/recipes/{id}": { /* ... your existing recipes/{id} endpoints ... */ },
-
-    // MEALPLANS ENDPOINTS
+    // MEALPLANS endpoints updated to require Google OAuth
     "/mealplans": {
       "get": {
         "tags": ["MealPlans"],
-        "description": "Get all meal plans (public access)",
+        "description": "Get all meal plans (you must log in via Google)",
+        "security": [{ "googleOAuth": [] }],
         "responses": {
           "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
           "500": { "description": "Internal Server Error" }
         }
       },
       "post": {
         "tags": ["MealPlans"],
-        "description": "Create a new meal plan (requires authentication)",
+        "description": "Create a new meal plan (you must log in via Google)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -68,17 +68,19 @@ const doc = {
     "/mealplans/{id}": {
       "get": {
         "tags": ["MealPlans"],
-        "description": "Get a meal plan by ID (public access)",
+        "description": "Get a meal plan by ID (you must log in via Google)",
+        "security": [{ "googleOAuth": [] }],
         "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
         "responses": {
           "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
           "404": { "description": "Not Found" },
           "500": { "description": "Internal Server Error" }
         }
       },
       "put": {
         "tags": ["MealPlans"],
-        "description": "Update a meal plan by ID (owner only, requires authentication)",
+        "description": "Update a meal plan by ID (owner only, you must log in via Google)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -110,7 +112,7 @@ const doc = {
       },
       "delete": {
         "tags": ["MealPlans"],
-        "description": "Delete a meal plan by ID (owner only, requires authentication)",
+        "description": "Delete a meal plan by ID (owner only, you must log in via Google)",
         "security": [{ "googleOAuth": [] }],
         "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
         "responses": {
@@ -123,19 +125,21 @@ const doc = {
       }
     },
 
-    // TAGS ENDPOINTS
+    // TAGS endpoints updated to require Google OAuth
     "/tags": {
       "get": {
         "tags": ["Tags"],
-        "description": "Get all tags (public access)",
+        "description": "Get all tags (you must log in via Google)",
+        "security": [{ "googleOAuth": [] }],
         "responses": {
           "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
           "500": { "description": "Internal Server Error" }
         }
       },
       "post": {
         "tags": ["Tags"],
-        "description": "Create a new tag (requires authentication)",
+        "description": "Create a new tag (you must log in via Google)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -163,17 +167,19 @@ const doc = {
     "/tags/{id}": {
       "get": {
         "tags": ["Tags"],
-        "description": "Get a tag by ID (public access)",
+        "description": "Get a tag by ID (you must log in via Google)",
+        "security": [{ "googleOAuth": [] }],
         "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
         "responses": {
           "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
           "404": { "description": "Not Found" },
           "500": { "description": "Internal Server Error" }
         }
       },
       "put": {
         "tags": ["Tags"],
-        "description": "Update a tag by ID (requires authentication)",
+        "description": "Update a tag by ID (you must log in via Google)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -202,7 +208,7 @@ const doc = {
       },
       "delete": {
         "tags": ["Tags"],
-        "description": "Delete a tag by ID (requires authentication)",
+        "description": "Delete a tag by ID (you must log in via Google)",
         "security": [{ "googleOAuth": [] }],
         "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
         "responses": {

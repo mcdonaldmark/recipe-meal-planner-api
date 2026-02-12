@@ -128,7 +128,7 @@
       },
       "post": {
         "tags": ["Recipes"],
-        "description": "Create a new recipe (requires authentication)",
+        "description": "Create a new recipe (you must log in via Google)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -169,7 +169,7 @@
       },
       "put": {
         "tags": ["Recipes"],
-        "description": "Update a recipe by ID (owner only, requires authentication)",
+        "description": "Update a recipe by ID (owner only, you must log in via Google)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -201,7 +201,7 @@
       },
       "delete": {
         "tags": ["Recipes"],
-        "description": "Delete a recipe by ID (owner only, requires authentication)",
+        "description": "Delete a recipe by ID (owner only, you must log in via Google)",
         "security": [{ "googleOAuth": [] }],
         "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
         "responses": {
@@ -217,15 +217,17 @@
     "/mealplans": {
       "get": {
         "tags": ["MealPlans"],
-        "description": "Get all meal plans (public access)",
+        "description": "Get all meal plans (you must log in via Google)",
+        "security": [{ "googleOAuth": [] }],
         "responses": {
           "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
           "500": { "description": "Internal Server Error" }
         }
       },
       "post": {
         "tags": ["MealPlans"],
-        "description": "Create a new meal plan (requires authentication)",
+        "description": "Create a new meal plan (you must log in via Google)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -256,17 +258,19 @@
     "/mealplans/{id}": {
       "get": {
         "tags": ["MealPlans"],
-        "description": "Get a meal plan by ID (public access)",
+        "description": "Get a meal plan by ID (you must log in via Google)",
+        "security": [{ "googleOAuth": [] }],
         "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
         "responses": {
           "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
           "404": { "description": "Not Found" },
           "500": { "description": "Internal Server Error" }
         }
       },
       "put": {
         "tags": ["MealPlans"],
-        "description": "Update a meal plan by ID (owner only, requires authentication)",
+        "description": "Update a meal plan by ID (owner only, you must log in via Google)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -298,7 +302,7 @@
       },
       "delete": {
         "tags": ["MealPlans"],
-        "description": "Delete a meal plan by ID (owner only, requires authentication)",
+        "description": "Delete a meal plan by ID (owner only, you must log in via Google)",
         "security": [{ "googleOAuth": [] }],
         "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
         "responses": {
@@ -314,15 +318,17 @@
     "/tags": {
       "get": {
         "tags": ["Tags"],
-        "description": "Get all tags (public access)",
+        "description": "Get all tags (you must log in via Google)",
+        "security": [{ "googleOAuth": [] }],
         "responses": {
           "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
           "500": { "description": "Internal Server Error" }
         }
       },
       "post": {
         "tags": ["Tags"],
-        "description": "Create a new tag (requires authentication)",
+        "description": "Create a new tag (you must log in via Google)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -350,17 +356,19 @@
     "/tags/{id}": {
       "get": {
         "tags": ["Tags"],
-        "description": "Get a tag by ID (public access)",
+        "description": "Get a tag by ID (you must log in via Google)",
+        "security": [{ "googleOAuth": [] }],
         "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
         "responses": {
           "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
           "404": { "description": "Not Found" },
           "500": { "description": "Internal Server Error" }
         }
       },
       "put": {
         "tags": ["Tags"],
-        "description": "Update a tag by ID (requires authentication)",
+        "description": "Update a tag by ID (you must log in via Google)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -389,7 +397,7 @@
       },
       "delete": {
         "tags": ["Tags"],
-        "description": "Delete a tag by ID (requires authentication)",
+        "description": "Delete a tag by ID (you must log in via Google)",
         "security": [{ "googleOAuth": [] }],
         "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
         "responses": {
