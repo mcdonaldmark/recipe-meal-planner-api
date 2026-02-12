@@ -4,6 +4,6 @@ const router = express.Router();
 router.use("/recipes", require("./recipes"));
 router.use("/users", require("./users"));
 router.use("/tags", require("./tags"));
-router.use("/mealplan", require("./mealPlan"));
+router.use("/mealplans", require("./mealPlan"));
 
 module.exports = router;
