@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Recipe & Meal Planner API",
-    "description": "API for recipes and users",
+    "description": "API for recipes, users, meal plans, and tags",
     "version": "1.0.0"
   },
   "host": "recipe-meal-planner-api-nooc.onrender.com",
@@ -17,6 +17,106 @@
     }
   },
   "paths": {
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "description": "Get all users (requires Google OAuth authentication)",
+        "security": [{ "googleOAuth": [] }],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "description": "Create a new user (requires authentication, usually Google OAuth)",
+        "consumes": ["application/json"],
+        "security": [{ "googleOAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": { "example": "Mark" },
+                "lastName": { "example": "McDonald" },
+                "email": { "example": "mark@example.com" },
+                "username": { "example": "markm" },
+                "password": { "example": "Password123" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Created" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "description": "Get a user by ID (requires authentication)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
+        "security": [{ "googleOAuth": [] }],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "description": "Update a user by ID (self only for normal users, unrestricted for Google OAuth users)",
+        "consumes": ["application/json"],
+        "security": [{ "googleOAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": { "example": "Mark" },
+                "lastName": { "example": "McDonald" },
+                "email": { "example": "mark@example.com" },
+                "username": { "example": "markm" },
+                "locale": { "example": "en-US" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "User updated successfully" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "description": "Delete a user by ID (self only for normal users, unrestricted for Google OAuth users)",
+        "security": [{ "googleOAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
+        "responses": {
+          "200": { "description": "User deleted successfully" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+
     "/recipes": {
       "get": {
         "tags": ["Recipes"],
@@ -60,9 +160,7 @@
       "get": {
         "tags": ["Recipes"],
         "description": "Get a recipe by ID (public access)",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" }
-        ],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
         "responses": {
           "200": { "description": "OK" },
           "404": { "description": "Not Found" },
@@ -71,7 +169,7 @@
       },
       "put": {
         "tags": ["Recipes"],
-        "description": "Update a recipe by ID (requires authentication, owner only)",
+        "description": "Update a recipe by ID (owner only, requires authentication)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -103,11 +201,9 @@
       },
       "delete": {
         "tags": ["Recipes"],
-        "description": "Delete a recipe by ID (requires authentication, owner only)",
+        "description": "Delete a recipe by ID (owner only, requires authentication)",
         "security": [{ "googleOAuth": [] }],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" }
-        ],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
         "responses": {
           "200": { "description": "Recipe deleted successfully" },
           "401": { "description": "Unauthorized" },
@@ -117,18 +213,19 @@
         }
       }
     },
-    "/users": {
+
+    "/mealplans": {
       "get": {
-        "tags": ["Users"],
-        "description": "Get all users (public access)",
+        "tags": ["MealPlans"],
+        "description": "Get all meal plans (public access)",
         "responses": {
           "200": { "description": "OK" },
           "500": { "description": "Internal Server Error" }
         }
       },
       "post": {
-        "tags": ["Users"],
-        "description": "Create a new user (requires authentication)",
+        "tags": ["MealPlans"],
+        "description": "Create a new meal plan (requires authentication)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -139,11 +236,11 @@
             "schema": {
               "type": "object",
               "properties": {
-                "firstName": { "example": "Mark" },
-                "lastName": { "example": "McDonald" },
-                "email": { "example": "mark@example.com" },
-                "username": { "example": "markm" },
-                "password": { "example": "Password123" }
+                "title": { "example": "Weekly Plan" },
+                "description": { "example": "My weekly meal plan" },
+                "recipes": { "type": "array", "items": { "example": "recipeId123" } },
+                "startDate": { "example": "2026-02-12" },
+                "endDate": { "example": "2026-02-18" }
               }
             }
           }
@@ -151,17 +248,16 @@
         "responses": {
           "201": { "description": "Created" },
           "400": { "description": "Bad Request" },
-          "401": { "description": "Unauthorized" }
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Internal Server Error" }
         }
       }
     },
-    "/users/{id}": {
+    "/mealplans/{id}": {
       "get": {
-        "tags": ["Users"],
-        "description": "Get a user by ID (public access)",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" }
-        ],
+        "tags": ["MealPlans"],
+        "description": "Get a meal plan by ID (public access)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
         "responses": {
           "200": { "description": "OK" },
           "404": { "description": "Not Found" },
@@ -169,8 +265,8 @@
         }
       },
       "put": {
-        "tags": ["Users"],
-        "description": "Update a user by ID (requires authentication, self only)",
+        "tags": ["MealPlans"],
+        "description": "Update a meal plan by ID (owner only, requires authentication)",
         "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
@@ -182,11 +278,11 @@
             "schema": {
               "type": "object",
               "properties": {
-                "firstName": { "example": "Mark" },
-                "lastName": { "example": "McDonald" },
-                "email": { "example": "mark@example.com" },
-                "username": { "example": "markm" },
-                "locale": { "example": "en-US" }
+                "title": { "example": "Updated Plan" },
+                "description": { "example": "Updated description" },
+                "recipes": { "type": "array", "items": { "example": "recipeId456" } },
+                "startDate": { "example": "2026-02-15" },
+                "endDate": { "example": "2026-02-21" }
               }
             }
           }
@@ -201,14 +297,103 @@
         }
       },
       "delete": {
-        "tags": ["Users"],
-        "description": "Delete a user by ID (requires authentication, self only)",
+        "tags": ["MealPlans"],
+        "description": "Delete a meal plan by ID (owner only, requires authentication)",
+        "security": [{ "googleOAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
+        "responses": {
+          "200": { "description": "Meal plan deleted successfully" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+
+    "/tags": {
+      "get": {
+        "tags": ["Tags"],
+        "description": "Get all tags (public access)",
+        "responses": {
+          "200": { "description": "OK" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "post": {
+        "tags": ["Tags"],
+        "description": "Create a new tag (requires authentication)",
+        "consumes": ["application/json"],
         "security": [{ "googleOAuth": [] }],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" }
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "example": "Italian" },
+                "color": { "example": "#FF0000" }
+              }
+            }
+          }
         ],
         "responses": {
-          "200": { "description": "User deleted successfully" },
+          "201": { "description": "Created" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/tags/{id}": {
+      "get": {
+        "tags": ["Tags"],
+        "description": "Get a tag by ID (public access)",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
+        "responses": {
+          "200": { "description": "OK" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "put": {
+        "tags": ["Tags"],
+        "description": "Update a tag by ID (requires authentication)",
+        "consumes": ["application/json"],
+        "security": [{ "googleOAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "example": "Updated Tag" },
+                "color": { "example": "#00FF00" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "delete": {
+        "tags": ["Tags"],
+        "description": "Delete a tag by ID (requires authentication)",
+        "security": [{ "googleOAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
+        "responses": {
+          "200": { "description": "Tag deleted successfully" },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden" },
           "404": { "description": "Not Found" },
