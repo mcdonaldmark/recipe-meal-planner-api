@@ -13,10 +13,6 @@ const swaggerDocument = require('./swagger.json');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ---- REMOVE connectDB() from here ----
-// We'll call it only in real server mode
-
-// Middleware
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
@@ -36,10 +32,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Swagger docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Routes
 app.use('/auth', require('./routes/auth'));
 console.log('✔️ Auth routes loaded');
 
@@ -53,7 +47,6 @@ app.use("/tags", require("./routes/tags"));
 
 app.use("/mealplans", require("./routes/mealPlan"));
 
-// Auth redirect routes
 app.get('/login', (req, res) => {
   res.redirect('/auth/google');
 });
@@ -94,17 +87,14 @@ app.get('/logout', (req, res) => {
   });
 });
 
-// Base route
 app.get('/', (req, res) => {
   res.send('Recipe & Meal Planner API is running');
 });
 
-// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// --- Start server only if not in test mode ---
 if (process.env.NODE_ENV !== 'test') {
   const connectDB = require('./data/database');
   connectDB().then(() => {
@@ -114,5 +104,4 @@ if (process.env.NODE_ENV !== 'test') {
   });
 }
 
-// Export app for testing
 module.exports = app;

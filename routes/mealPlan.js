@@ -5,13 +5,10 @@ const ensureAuthenticated = require("../middleware/auth");
 const { body } = require("express-validator");
 const validate = require("../middleware/validation");
 
-// GET all meal plans
 router.get("/", ensureAuthenticated, mealPlanController.getMealPlans);
 
-// GET meal plan by ID
 router.get("/:id", ensureAuthenticated, mealPlanController.getMealPlanById);
 
-// POST create new meal plan
 router.post(
   "/",
   ensureAuthenticated,
@@ -27,7 +24,6 @@ router.post(
   mealPlanController.createMealPlan
 );
 
-// PUT update meal plan
 router.put(
   "/:id",
   ensureAuthenticated,
@@ -42,7 +38,6 @@ router.put(
   mealPlanController.updateMealPlan
 );
 
-// DELETE meal plan
 router.delete("/:id", ensureAuthenticated, mealPlanController.deleteMealPlan);
 
 module.exports = router;

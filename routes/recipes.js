@@ -5,13 +5,10 @@ const ensureAuthenticated = require('../middleware/auth');
 const { body } = require('express-validator');
 const validate = require('../middleware/validation');
 
-// GET all recipes
 router.get('/', ensureAuthenticated, recipesController.getAllRecipes);
 
-// GET a recipe by ID
 router.get('/:id', ensureAuthenticated, recipesController.getRecipeById);
 
-// POST create a new recipe
 router.post(
   '/',
   ensureAuthenticated,
@@ -33,7 +30,6 @@ router.post(
   recipesController.createRecipe
 );
 
-// PUT update a recipe
 router.put(
   '/:id',
   ensureAuthenticated,
@@ -51,7 +47,6 @@ router.put(
   recipesController.updateRecipe
 );
 
-// DELETE a recipe
 router.delete('/:id', ensureAuthenticated, recipesController.deleteRecipe);
 
 module.exports = router;

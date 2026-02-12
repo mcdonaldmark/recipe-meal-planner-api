@@ -6,9 +6,8 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const app = require('../server');
 const MealPlan = require('../models/MealPlan');
 
-// Mock auth middleware to provide a fake logged-in user
 jest.mock('../middleware/auth', () => (req, res, next) => {
-  req.user = { id: '507f1f77bcf86cd799439011' }; // fixed user ID for tests
+  req.user = { id: '507f1f77bcf86cd799439011' };
   next();
 });
 

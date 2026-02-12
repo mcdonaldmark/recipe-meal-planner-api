@@ -3,7 +3,6 @@ const router = express.Router();
 const tagController = require("../controllers/tagController");
 const ensureAuthenticated = require("../middleware/auth");
 
-// All routes require Google login
 router.get("/", ensureAuthenticated, tagController.getAllTags);
 router.get("/:id", ensureAuthenticated, tagController.getTagById);
 router.post("/", ensureAuthenticated, tagController.createTag);

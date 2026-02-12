@@ -1,7 +1,6 @@
 // controllers/mealPlanController.js
 const MealPlan = require("../models/MealPlan");
 
-// GET meal plan by ID
 const getMealPlanById = async (req, res) => {
   try {
     const mealPlan = await MealPlan.findById(req.params.id)
@@ -9,7 +8,6 @@ const getMealPlanById = async (req, res) => {
 
     if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
 
-    // Ensure the current user owns the meal plan
     const mealPlanUserId = mealPlan.userId._id ? mealPlan.userId._id.toString() : mealPlan.userId.toString();
     if (mealPlanUserId !== req.user.id) {
       return res.status(403).json({ message: "Not allowed" });
@@ -22,7 +20,6 @@ const getMealPlanById = async (req, res) => {
   }
 };
 
-// GET all meal plans for current user
 const getMealPlans = async (req, res) => {
   try {
     const mealPlans = await MealPlan.find({ userId: req.user.id })
@@ -35,12 +32,11 @@ const getMealPlans = async (req, res) => {
   }
 };
 
-// CREATE a new meal plan
 const createMealPlan = async (req, res) => {
   try {
     const newMealPlan = new MealPlan({
       ...req.body,
-      userId: req.user.id, // always set from logged-in user
+      userId: req.user.id,
     });
 
     const savedMealPlan = await newMealPlan.save();
@@ -51,7 +47,6 @@ const createMealPlan = async (req, res) => {
   }
 };
 
-// UPDATE a meal plan by ID
 const updateMealPlan = async (req, res) => {
   try {
     const mealPlan = await MealPlan.findById(req.params.id);
@@ -71,7 +66,6 @@ const updateMealPlan = async (req, res) => {
   }
 };
 
-// DELETE a meal plan by ID
 const deleteMealPlan = async (req, res) => {
   try {
     const mealPlan = await MealPlan.findById(req.params.id);

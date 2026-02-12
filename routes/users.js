@@ -5,13 +5,10 @@ const ensureAuthenticated = require('../middleware/auth');
 const { body } = require('express-validator');
 const validate = require('../middleware/validation');
 
-// GET all users
 router.get('/', ensureAuthenticated, usersController.getAllUsers);
 
-// GET a user by ID
 router.get('/:id', ensureAuthenticated, usersController.getUserById);
 
-// POST create a new user
 router.post(
   '/',
   ensureAuthenticated,
@@ -26,7 +23,6 @@ router.post(
   usersController.createUser
 );
 
-// PUT update a user
 router.put(
   '/:id',
   ensureAuthenticated,
@@ -41,7 +37,6 @@ router.put(
   usersController.updateUser
 );
 
-// DELETE a user
 router.delete('/:id', ensureAuthenticated, usersController.deleteUser);
 
 module.exports = router;

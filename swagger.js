@@ -17,13 +17,11 @@ const doc = {
     }
   },
   paths: {
-    // USERS and RECIPES endpoints remain unchanged
-    "/users": { /* ... your existing users endpoints ... */ },
-    "/users/{id}": { /* ... */ },
-    "/recipes": { /* ... */ },
-    "/recipes/{id}": { /* ... */ },
+    "/users": { },
+    "/users/{id}": {},
+    "/recipes": {},
+    "/recipes/{id}": {},
 
-    // MEALPLANS endpoints updated to require Google OAuth
     "/mealplans": {
       "get": {
         "tags": ["MealPlans"],
@@ -125,7 +123,6 @@ const doc = {
       }
     },
 
-    // TAGS endpoints updated to require Google OAuth
     "/tags": {
       "get": {
         "tags": ["Tags"],
