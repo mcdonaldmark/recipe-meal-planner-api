@@ -5,8 +5,8 @@ const doc = {
     title: 'Recipe & Meal Planner API',
     description: 'API for recipes, users, meal plans, and tags'
   },
-  host: 'localhost:3000',
-  schemes: ['http'],
+  host: 'recipe-meal-planner-api-nooc.onrender.com',
+  schemes: ['https'],
   basePath: '/',
   securityDefinitions: {
     googleOAuth: {
