@@ -165,37 +165,42 @@ const doc = {
           500: { description: "Internal Server Error" }
         }
       },
-      post: {
-        tags: ["MealPlans"],
-        description: "Create a new meal plan (Google login required)",
-        consumes: ["application/json"],
-        security: [{ "googleOAuth": [] }],
-        parameters: [
-          {
-            name: "body",
-            in: "body",
-            required: true,
-            schema: {
-              type: "object",
-              properties: {
-                userId: { example: "userId123" },
-                recipeId: { example: "recipeId123" },
-                date: { example: "2026-02-12T00:00:00Z" },
-                mealType: { example: "lunch", enum: ["breakfast", "lunch", "dinner", "snack"] },
-                notes: { example: "Extra veggies" }
-              },
-              required: ["recipeId", "mealType"]
-            }
-          }
-        ],
-        responses: {
-          201: { description: "Created" },
-          400: { description: "Bad Request" },
-          401: { description: "Unauthorized" },
-          500: { description: "Internal Server Error" }
+  },
+  post: {
+    tags: ["MealPlans"],
+    description: "Create a new meal plan (Google login required)",
+    consumes: ["application/json"],
+    security: [{ "googleOAuth": [] }],
+    parameters: [
+      {
+        name: "body",
+        in: "body",
+        required: true,
+        schema: {
+          type: "object",
+          properties: {
+            userId: { example: "userId123" },
+            recipeId: { 
+              type: "array", 
+              items: { type: "string", example: "recipeId123" }, 
+              description: "Array of recipe IDs for this meal plan" 
+            },
+            date: { example: "2026-02-12T00:00:00Z" },
+            mealType: { example: "lunch", enum: ["breakfast", "lunch", "dinner", "snack"] },
+            notes: { example: "Extra veggies" }
+          },
+          required: ["recipeId", "mealType"]
         }
       }
-    },
+    ],
+    responses: {
+      201: { description: "Meal plan created successfully" },
+      400: { description: "Bad Request" },
+      401: { description: "Unauthorized" },
+      500: { description: "Internal Server Error" }
+    }
+  }
+},
     "/mealplans/{id}": {
       get: {
         tags: ["MealPlans"],
@@ -342,7 +347,7 @@ const doc = {
       }
     }
   }
-};
+;
 
 const outputFile = './swagger.json';
 const endpointsFiles = [
