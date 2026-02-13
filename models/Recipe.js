@@ -11,14 +11,15 @@ const recipeSchema = new mongoose.Schema(
     description: { type: String },
     ingredients: [{ type: String }],
     steps: [{ type: String }],
-    tags: [
+    tagsId: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Tag",
+        required: true,
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Recipe", recipeSchema);
