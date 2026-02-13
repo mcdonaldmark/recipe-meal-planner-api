@@ -313,12 +313,12 @@
               "properties": {
                 "title": {"example": "Weekly Plan"},
                 "description": {"example": "My weekly meal plan"},
-                "recipeIds": {"type":"array","items":{"example":"recipeId123"}},
+                "recipeId": {"type":"array","items":{"example":"recipeId123"}},
                 "mealType": {"example":"lunch"},
                 "startDate": {"example":"2026-02-12"},
                 "endDate": {"example":"2026-02-18"}
               },
-              "required":["recipeIds","mealType"]
+              "required":["recipeId","mealType"]
             }
           }
         ],
@@ -352,11 +352,11 @@
             "schema":{"type":"object","properties":{
               "title":{"example":"Updated Plan"},
               "description":{"example":"Updated description"},
-              "recipeIds":{"type":"array","items":{"example":"recipeId456"}},
+              "recipeId":{"type":"array","items":{"example":"recipeId456"}},
               "mealType":{"example":"dinner"},
               "startDate":{"example":"2026-02-15"},
               "endDate":{"example":"2026-02-21"}
-            },"required":["recipeIds","mealType"]}}
+            },"required":["recipeId","mealType"]}}
         ],
         "responses":{
           "200":{"description":"Meal plan updated successfully"},
