@@ -1,3 +1,4 @@
+// models/MealPlan.js
 const mongoose = require("mongoose");
 
 const mealPlanSchema = new mongoose.Schema(
@@ -7,11 +8,13 @@ const mealPlanSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    recipeId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Recipe",
-      required: true,
-    },
+    recipeIds: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Recipe",
+        required: true,
+      },
+    ],
     date: {
       type: Date,
       required: true,
@@ -26,7 +29,7 @@ const mealPlanSchema = new mongoose.Schema(
       type: String,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("MealPlan", mealPlanSchema);
