@@ -5,9 +5,9 @@
     "description": "API for recipes, users, meal plans, and tags",
     "version": "1.0.0"
   },
-  "host": "recipe-meal-planner-api-nooc.onrender.com",
+  "host": "localhost:3000",
   "basePath": "/",
-  "schemes": ["https"],
+  "schemes": ["http"],
   "securityDefinitions": {
     "googleOAuth": {
       "type": "oauth2",
@@ -18,20 +18,11 @@
   },
   "paths": {
     "/users": {
-      "get": {
-        "tags": ["Users"],
-        "description": "Get all users (Google login required)",
-        "security": [{ "googleOAuth": [] }],
-        "responses": {
-          "200": { "description": "OK" },
-          "401": { "description": "Unauthorized" },
-          "500": { "description": "Internal Server Error" }
-        }
-      },
       "post": {
         "tags": ["Users"],
-        "description": "Create a new user",
+        "description": "Create a new user (Google login required)",
         "consumes": ["application/json"],
+        "security": [{"googleOAuth": []}],
         "parameters": [
           {
             "name": "body",
@@ -39,42 +30,32 @@
             "required": true,
             "schema": {
               "type": "object",
-              "required": ["name", "email"],
               "properties": {
-                "name": { "type": "string", "example": "John Doe" },
-                "email": { "type": "string", "example": "john@example.com" }
-              }
+                "firstName": {"example": "John"},
+                "lastName": {"example": "Doe"},
+                "email": {"example": "john@example.com"},
+                "username": {"example": "johndoe"},
+                "locale": {"example": "en-US"}
+              },
+              "required": ["firstName", "lastName", "email"]
             }
           }
         ],
         "responses": {
-          "201": { "description": "Created" },
-          "400": { "description": "Bad Request" },
-          "401": { "description": "Unauthorized" },
-          "500": { "description": "Internal Server Error" }
+          "201": {"description": "User created successfully"},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"}
         }
       }
     },
     "/users/{id}": {
-      "get": {
-        "tags": ["Users"],
-        "description": "Get a user by ID",
-        "security": [{ "googleOAuth": [] }],
-        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
-        "responses": {
-          "200": { "description": "OK" },
-          "401": { "description": "Unauthorized" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
-      },
       "put": {
         "tags": ["Users"],
         "description": "Update a user by ID",
         "consumes": ["application/json"],
-        "security": [{ "googleOAuth": [] }],
+        "security": [{"googleOAuth": []}],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {"name": "id", "in": "path", "required": true, "type": "string"},
           {
             "name": "body",
             "in": "body",
@@ -82,50 +63,29 @@
             "schema": {
               "type": "object",
               "properties": {
-                "name": { "type": "string", "example": "Updated Name" },
-                "email": { "type": "string", "example": "updated@example.com" }
+                "firstName": {"example": "Jane"},
+                "lastName": {"example": "Smith"},
+                "email": {"example": "jane@example.com"},
+                "username": {"example": "janesmith"},
+                "locale": {"example": "en-US"}
               }
             }
           }
         ],
         "responses": {
-          "200": { "description": "OK" },
-          "400": { "description": "Bad Request" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
-      },
-      "delete": {
-        "tags": ["Users"],
-        "description": "Delete a user by ID",
-        "security": [{ "googleOAuth": [] }],
-        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
-        "responses": {
-          "200": { "description": "User deleted successfully" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
+          "200": {"description": "User updated successfully"},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Not Found"}
         }
       }
     },
     "/recipes": {
-      "get": {
-        "tags": ["Recipes"],
-        "description": "Get all recipes",
-        "security": [{ "googleOAuth": [] }],
-        "responses": {
-          "200": { "description": "OK" },
-          "401": { "description": "Unauthorized" },
-          "500": { "description": "Internal Server Error" }
-        }
-      },
       "post": {
         "tags": ["Recipes"],
         "description": "Create a new recipe",
         "consumes": ["application/json"],
+        "security": [{"googleOAuth": []}],
         "parameters": [
           {
             "name": "body",
@@ -133,44 +93,35 @@
             "required": true,
             "schema": {
               "type": "object",
-              "required": ["name", "ingredients", "instructions"],
               "properties": {
-                "name": { "type": "string", "example": "Spaghetti" },
-                "ingredients": { "type": "array", "items": { "type": "string", "example": "Pasta" } },
-                "instructions": { "type": "string", "example": "Boil pasta, add sauce" },
-                "tags": { "type": "array", "items": { "type": "string", "example": "Italian" } }
-              }
+                "userId": {"example": "userId123"},
+                "title": {"example": "Spaghetti Bolognese"},
+                "description": {"example": "Classic Italian pasta"},
+                "ingredients": {"type": "array", "items": {"example": "Tomatoes"}},
+                "steps": {"type": "array", "items": {"example": "Boil pasta"}},
+                "tagsId": {"type": "array", "items": {"example": "tagId123"}},
+                "cookingTime": {"example": 30},
+                "difficulty": {"example": "medium", "enum": ["easy","medium","hard"]},
+                "servings": {"example": 4}
+              },
+              "required": ["title", "ingredients", "steps"]
             }
           }
         ],
         "responses": {
-          "201": { "description": "Created" },
-          "400": { "description": "Bad Request" },
-          "401": { "description": "Unauthorized" },
-          "500": { "description": "Internal Server Error" }
+          "201": {"description": "Recipe created successfully"},
+          "400": {"description": "Bad Request"}
         }
       }
     },
     "/recipes/{id}": {
-      "get": {
-        "tags": ["Recipes"],
-        "description": "Get a recipe by ID",
-        "security": [{ "googleOAuth": [] }],
-        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
-        "responses": {
-          "200": { "description": "OK" },
-          "401": { "description": "Unauthorized" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
-      },
       "put": {
         "tags": ["Recipes"],
         "description": "Update a recipe by ID",
         "consumes": ["application/json"],
-        "security": [{ "googleOAuth": [] }],
+        "security": [{"googleOAuth": []}],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {"name": "id", "in": "path", "required": true, "type": "string"},
           {
             "name": "body",
             "in": "body",
@@ -178,53 +129,42 @@
             "schema": {
               "type": "object",
               "properties": {
-                "name": { "type": "string", "example": "Updated Recipe" },
-                "ingredients": { "type": "array", "items": { "type": "string", "example": "Updated Ingredient" } },
-                "instructions": { "type": "string", "example": "Updated instructions" },
-                "tags": { "type": "array", "items": { "type": "string", "example": "Updated Tag" } }
+                "userId": {"example": "userId123"},
+                "title": {"example": "Updated Recipe"},
+                "description": {"example": "Updated description"},
+                "ingredients": {"type": "array", "items": {"example": "Updated ingredient"}},
+                "steps": {"type": "array", "items": {"example": "Updated step"}},
+                "tagsId": {"type": "array", "items": {"example": "tagId456"}},
+                "cookingTime": {"example": 25},
+                "difficulty": {"example": "easy", "enum": ["easy","medium","hard"]},
+                "servings": {"example": 2}
               }
             }
           }
         ],
         "responses": {
-          "200": { "description": "OK" },
-          "400": { "description": "Bad Request" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
-      },
-      "delete": {
-        "tags": ["Recipes"],
-        "description": "Delete a recipe by ID",
-        "security": [{ "googleOAuth": [] }],
-        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
-        "responses": {
-          "200": { "description": "Recipe deleted successfully" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
+          "200": {"description": "Recipe updated successfully"},
+          "400": {"description": "Bad Request"},
+          "404": {"description": "Not Found"}
         }
       }
     },
     "/mealplans": {
       "get": {
         "tags": ["MealPlans"],
-        "description": "Get all meal plans (Google login required)",
-        "security": [{ "googleOAuth": [] }],
+        "description": "Get all meal plans",
+        "security": [{"googleOAuth": []}],
         "responses": {
-          "200": { "description": "OK" },
-          "401": { "description": "Unauthorized" },
-          "500": { "description": "Internal Server Error" }
+          "200": {"description": "OK"},
+          "401": {"description": "Unauthorized"},
+          "500": {"description": "Internal Server Error"}
         }
       },
       "post": {
         "tags": ["MealPlans"],
         "description": "Create a new meal plan",
         "consumes": ["application/json"],
-        "security": [{ "googleOAuth": [] }],
+        "security": [{"googleOAuth": []}],
         "parameters": [
           {
             "name": "body",
@@ -232,23 +172,22 @@
             "required": true,
             "schema": {
               "type": "object",
-              "required": ["title", "mealType", "recipes"],
               "properties": {
-                "title": { "type": "string", "example": "Weekly Plan" },
-                "description": { "type": "string", "example": "My weekly meal plan" },
-                "mealType": { "type": "string", "example": "Lunch" },
-                "recipes": { "type": "array", "items": { "type": "string", "example": "recipeId123" } },
-                "startDate": { "type": "string", "example": "2026-02-12" },
-                "endDate": { "type": "string", "example": "2026-02-18" }
-              }
+                "userId": {"example": "userId123"},
+                "recipeId": {"example": "recipeId123"},
+                "date": {"example": "2026-02-12T00:00:00Z"},
+                "mealType": {"example": "lunch", "enum": ["breakfast","lunch","dinner","snack"]},
+                "notes": {"example": "Extra veggies"}
+              },
+              "required": ["recipeId", "mealType"]
             }
           }
         ],
         "responses": {
-          "201": { "description": "Created" },
-          "400": { "description": "Bad Request" },
-          "401": { "description": "Unauthorized" },
-          "500": { "description": "Internal Server Error" }
+          "201": {"description": "Created"},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"},
+          "500": {"description": "Internal Server Error"}
         }
       }
     },
@@ -256,60 +195,13 @@
       "get": {
         "tags": ["MealPlans"],
         "description": "Get a meal plan by ID",
-        "security": [{ "googleOAuth": [] }],
-        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
+        "security": [{"googleOAuth": []}],
+        "parameters": [{"name": "id", "in": "path", "required": true, "type": "string"}],
         "responses": {
-          "200": { "description": "OK" },
-          "401": { "description": "Unauthorized" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
-      },
-      "put": {
-        "tags": ["MealPlans"],
-        "description": "Update a meal plan by ID",
-        "consumes": ["application/json"],
-        "security": [{ "googleOAuth": [] }],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": ["title", "mealType", "recipes"],
-              "properties": {
-                "title": { "type": "string", "example": "Updated Plan" },
-                "description": { "type": "string", "example": "Updated description" },
-                "mealType": { "type": "string", "example": "Dinner" },
-                "recipes": { "type": "array", "items": { "type": "string", "example": "recipeId456" } },
-                "startDate": { "type": "string", "example": "2026-02-15" },
-                "endDate": { "type": "string", "example": "2026-02-21" }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": { "description": "OK" },
-          "400": { "description": "Bad Request" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
-      },
-      "delete": {
-        "tags": ["MealPlans"],
-        "description": "Delete a meal plan by ID",
-        "security": [{ "googleOAuth": [] }],
-        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
-        "responses": {
-          "200": { "description": "Meal plan deleted successfully" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
+          "200": {"description": "OK"},
+          "401": {"description": "Unauthorized"},
+          "404": {"description": "Not Found"},
+          "500": {"description": "Internal Server Error"}
         }
       }
     },
@@ -317,18 +209,18 @@
       "get": {
         "tags": ["Tags"],
         "description": "Get all tags",
-        "security": [{ "googleOAuth": [] }],
+        "security": [{"googleOAuth": []}],
         "responses": {
-          "200": { "description": "OK" },
-          "401": { "description": "Unauthorized" },
-          "500": { "description": "Internal Server Error" }
+          "200": {"description": "OK"},
+          "401": {"description": "Unauthorized"},
+          "500": {"description": "Internal Server Error"}
         }
       },
       "post": {
         "tags": ["Tags"],
         "description": "Create a new tag",
         "consumes": ["application/json"],
-        "security": [{ "googleOAuth": [] }],
+        "security": [{"googleOAuth": []}],
         "parameters": [
           {
             "name": "body",
@@ -336,75 +228,19 @@
             "required": true,
             "schema": {
               "type": "object",
-              "required": ["name", "color"],
               "properties": {
-                "name": { "type": "string", "example": "Italian" },
-                "color": { "type": "string", "example": "#FF0000" }
-              }
+                "name": {"example": "Italian"},
+                "description": {"example": "Pasta and pizza style"}
+              },
+              "required": ["name"]
             }
           }
         ],
         "responses": {
-          "201": { "description": "Created" },
-          "400": { "description": "Bad Request" },
-          "401": { "description": "Unauthorized" },
-          "500": { "description": "Internal Server Error" }
-        }
-      }
-    },
-    "/tags/{id}": {
-      "get": {
-        "tags": ["Tags"],
-        "description": "Get a tag by ID",
-        "security": [{ "googleOAuth": [] }],
-        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
-        "responses": {
-          "200": { "description": "OK" },
-          "401": { "description": "Unauthorized" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
-      },
-      "put": {
-        "tags": ["Tags"],
-        "description": "Update a tag by ID",
-        "consumes": ["application/json"],
-        "security": [{ "googleOAuth": [] }],
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "type": "string" },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": { "type": "string", "example": "Updated Tag" },
-                "color": { "type": "string", "example": "#00FF00" }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": { "description": "OK" },
-          "400": { "description": "Bad Request" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
-        }
-      },
-      "delete": {
-        "tags": ["Tags"],
-        "description": "Delete a tag by ID",
-        "security": [{ "googleOAuth": [] }],
-        "parameters": [{ "name": "id", "in": "path", "required": true, "type": "string" }],
-        "responses": {
-          "200": { "description": "Tag deleted successfully" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden" },
-          "404": { "description": "Not Found" },
-          "500": { "description": "Internal Server Error" }
+          "201": {"description": "Created"},
+          "400": {"description": "Bad Request"},
+          "401": {"description": "Unauthorized"},
+          "500": {"description": "Internal Server Error"}
         }
       }
     }
