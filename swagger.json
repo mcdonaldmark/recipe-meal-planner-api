@@ -7,7 +7,7 @@
   },
   "host": "localhost:3000",
   "basePath": "/",
-  "schemes": ["http"],
+  "schemes": ["https"],
   "securityDefinitions": {
     "googleOAuth": {
       "type": "oauth2",
