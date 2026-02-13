@@ -289,7 +289,7 @@
                   "id": {"example": "mealplanId123"},
                   "title": {"example": "Weekly Plan"},
                   "description": {"example": "My weekly meal plan"},
-                  "recipeIds": {"type": "array","items":{"example":"recipeId123"}},
+                  "recipeId": {"type": "array","items":{"example":"recipeId123"}},
                   "mealType": {"example": "lunch"},
                   "startDate": {"example": "2026-02-12"},
                   "endDate": {"example": "2026-02-18"}
