@@ -13,39 +13,32 @@ const swaggerDocument = require('./swagger.json');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ------------------- CORS -------------------
-// Enable CORS for all routes
 app.use(cors({
-  origin: true,           // Allow requests from any origin
-  credentials: true       // Allow cookies to be sent
+  origin: true,           
+  credentials: true       
 }));
 
-// Parse JSON bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ------------------- Session -------------------
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      maxAge: 1000 * 60 * 60 * 24 * 7,
       secure: false,
       sameSite: 'lax',
     },
   })
 );
 
-// ------------------- Passport -------------------
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ------------------- Swagger -------------------
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// ------------------- Routes -------------------
 app.use('/auth', require('./routes/auth'));
 console.log('✔️ Auth routes loaded');
 
@@ -61,7 +54,6 @@ console.log('✔️ Tags routes loaded');
 app.use('/mealplans', require('./routes/mealPlan'));
 console.log('✔️ MealPlans routes loaded');
 
-// ------------------- Simple Redirects -------------------
 app.get('/login', (req, res) => res.redirect('/auth/google'));
 
 app.get('/redirect', (req, res) => {
@@ -104,12 +96,10 @@ app.get('/', (req, res) => {
   res.send('Recipe & Meal Planner API is running');
 });
 
-// ------------------- 404 Handler -------------------
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// ------------------- Start Server -------------------
 if (process.env.NODE_ENV !== 'test') {
   const connectDB = require('./data/database');
   connectDB().then(() => {

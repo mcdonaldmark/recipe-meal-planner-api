@@ -1,117 +1,92 @@
 const MealPlan = require("../models/MealPlan");
-const Recipe = require("../models/Recipe"); // adjust path if needed
-const User = require("../models/User");
 
-// ------------------- GET ALL MEAL PLANS -------------------
-const getAllMealPlans = async (req, res) => {
+const getMealPlans = async (req, res) => {
   try {
-    const mealPlans = await MealPlan.find()
-      .populate("recipeId", "title ingredients cookingTime difficulty") // populate recipe fields
-      .populate("userId", "firstName lastName email"); // populate user info
+    const mealPlans = await MealPlan.find({ userId: req.user.id })
+      .populate({ path: "recipeId", select: "title description -_id" });
 
-    res.status(200).json(mealPlans);
+    res.json(mealPlans);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// ------------------- GET MEAL PLAN BY ID -------------------
 const getMealPlanById = async (req, res) => {
   try {
     const mealPlan = await MealPlan.findById(req.params.id)
-      .populate("recipeId", "title ingredients cookingTime difficulty")
-      .populate("userId", "firstName lastName email");
+      .populate({ path: "recipeId", select: "title description -_id" });
 
-    if (!mealPlan) return res.status(404).json({ message: "Meal plan not found" });
+    if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
 
-    res.status(200).json(mealPlan);
+    if (mealPlan.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    res.json(mealPlan);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// ------------------- CREATE MEAL PLAN -------------------
 const createMealPlan = async (req, res) => {
   try {
-    const { userId, recipeId, date, mealType, notes } = req.body;
+    const { recipeId, mealType, date, notes } = req.body;
 
-    if (!userId || !recipeId || !mealType) {
-      return res.status(400).json({ message: "userId, recipeId, and mealType are required" });
-    }
-
-    // Validate existence of user and recipe
-    const user = await User.findById(userId);
-    const recipe = await Recipe.findById(recipeId);
-    if (!user) return res.status(404).json({ message: "User not found" });
-    if (!recipe) return res.status(404).json({ message: "Recipe not found" });
-
-    const mealPlan = new MealPlan({
-      userId,
+    const newMealPlan = new MealPlan({
       recipeId,
-      date: date || Date.now(),
       mealType,
+      date,
       notes,
+      userId: req.user.id,
     });
 
-    const savedMealPlan = await mealPlan.save();
-
-    await savedMealPlan
-      .populate("recipeId", "title ingredients cookingTime difficulty")
-      .populate("userId", "firstName lastName email");
-
+    const savedMealPlan = await newMealPlan.save();
     res.status(201).json(savedMealPlan);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// ------------------- UPDATE MEAL PLAN -------------------
 const updateMealPlan = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { recipeId, date, mealType, notes } = req.body;
+    const mealPlan = await MealPlan.findById(req.params.id);
+    if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
 
-    const mealPlan = await MealPlan.findById(id);
-    if (!mealPlan) return res.status(404).json({ message: "Meal plan not found" });
-
-    if (recipeId) {
-      const recipe = await Recipe.findById(recipeId);
-      if (!recipe) return res.status(404).json({ message: "Recipe not found" });
-      mealPlan.recipeId = recipeId;
+    if (mealPlan.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not allowed" });
     }
-    if (date) mealPlan.date = date;
-    if (mealType) mealPlan.mealType = mealType;
-    if (notes !== undefined) mealPlan.notes = notes;
 
+    Object.assign(mealPlan, req.body);
     const updatedMealPlan = await mealPlan.save();
-
-    await updatedMealPlan
-      .populate("recipeId", "title ingredients cookingTime difficulty")
-      .populate("userId", "firstName lastName email");
-
-    res.status(200).json(updatedMealPlan);
+    res.json(updatedMealPlan);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// ------------------- DELETE MEAL PLAN -------------------
 const deleteMealPlan = async (req, res) => {
   try {
-    const { id } = req.params;
+    const mealPlan = await MealPlan.findById(req.params.id);
+    if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
 
-    const mealPlan = await MealPlan.findById(id);
-    if (!mealPlan) return res.status(404).json({ message: "Meal plan not found" });
+    if (mealPlan.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
 
-    await mealPlan.remove();
-    res.status(200).json({ message: "Meal plan deleted successfully" });
+    await mealPlan.deleteOne();
+    res.json({ message: "MealPlan deleted" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
 
 module.exports = {
-  getAllMealPlans,
+  getMealPlans,
   getMealPlanById,
   createMealPlan,
   updateMealPlan,

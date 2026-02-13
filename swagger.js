@@ -17,7 +17,6 @@ const doc = {
     }
   },
   paths: {
-    // ------------------- USERS -------------------
     "/users": {
       post: {
         tags: ["Users"],
@@ -50,7 +49,6 @@ const doc = {
       }
     },
 
-    // ------------------- RECIPES -------------------
     "/recipes": {
       post: {
         tags: ["Recipes"],
@@ -86,7 +84,6 @@ const doc = {
       }
     },
 
-    // ------------------- MEALPLANS -------------------
     "/mealplans": {
       get: {
         tags: ["MealPlans"],
