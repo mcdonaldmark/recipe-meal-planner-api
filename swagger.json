@@ -5,9 +5,9 @@
     "description": "API for recipes, users, meal plans, and tags",
     "version": "1.0.0"
   },
-  "host": "localhost:3000",
+  "host": "recipe-meal-planner-api-nooc.onrender.com",
   "basePath": "/",
-  "schemes": ["http"],
+  "schemes": ["https"],
   "securityDefinitions": {
     "googleOAuth": {
       "type": "oauth2",
