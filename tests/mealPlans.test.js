@@ -1,13 +1,11 @@
-// tests/mealPlans.test.js
+const request = require("supertest");
+const mongoose = require("mongoose");
+const { MongoMemoryServer } = require("mongodb-memory-server");
+const app = require("../server");
+const MealPlan = require("../models/MealPlan");
 
-const request = require('supertest');
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const app = require('../server');
-const MealPlan = require('../models/MealPlan');
-
-jest.mock('../middleware/auth', () => (req, res, next) => {
-  req.user = { id: '507f1f77bcf86cd799439011' };
+jest.mock("../middleware/auth", () => (req, res, next) => {
+  req.user = { id: "507f1f77bcf86cd799439011" };
   next();
 });
 
@@ -31,45 +29,45 @@ afterAll(async () => {
   await mongoServer.stop();
 });
 
-describe('GET /mealplans endpoints', () => {
-  const userId = new mongoose.Types.ObjectId('507f1f77bcf86cd799439011');
+describe("GET /mealplans endpoints", () => {
+  const userId = new mongoose.Types.ObjectId("507f1f77bcf86cd799439011");
 
-  it('should return an empty array when no meal plans exist', async () => {
-    const res = await request(app).get('/mealplans');
+  it("should return an empty array when no meal plans exist", async () => {
+    const res = await request(app).get("/mealplans");
     expect(res.statusCode).toBe(200);
     expect(res.body).toEqual([]);
   });
 
-  it('should return all meal plans', async () => {
+  it("should return all meal plans", async () => {
     const mealPlan = await MealPlan.create({
       userId,
-      recipeId: new mongoose.Types.ObjectId(),
-      mealType: 'breakfast',
-      notes: 'Test note',
+      recipeIds: [new mongoose.Types.ObjectId()],
+      mealType: "breakfast",
+      notes: "Test note",
     });
 
-    const res = await request(app).get('/mealplans');
+    const res = await request(app).get("/mealplans");
     expect(res.statusCode).toBe(200);
     expect(res.body.length).toBe(1);
-    expect(res.body[0].mealType).toBe('breakfast');
-    expect(res.body[0].notes).toBe('Test note');
+    expect(res.body[0].mealType).toBe("breakfast");
+    expect(res.body[0].notes).toBe("Test note");
   });
 
-  it('should return a meal plan by id', async () => {
+  it("should return a meal plan by id", async () => {
     const mealPlan = await MealPlan.create({
       userId,
-      recipeId: new mongoose.Types.ObjectId(),
-      mealType: 'lunch',
-      notes: 'Lunch test',
+      recipeIds: [new mongoose.Types.ObjectId()],
+      mealType: "lunch",
+      notes: "Lunch test",
     });
 
     const res = await request(app).get(`/mealplans/${mealPlan._id}`);
     expect(res.statusCode).toBe(200);
-    expect(res.body.mealType).toBe('lunch');
-    expect(res.body.notes).toBe('Lunch test');
+    expect(res.body.mealType).toBe("lunch");
+    expect(res.body.notes).toBe("Lunch test");
   });
 
-  it('should return 404 if meal plan id does not exist', async () => {
+  it("should return 404 if meal plan id does not exist", async () => {
     const fakeId = new mongoose.Types.ObjectId();
     const res = await request(app).get(`/mealplans/${fakeId}`);
     expect(res.statusCode).toBe(404);

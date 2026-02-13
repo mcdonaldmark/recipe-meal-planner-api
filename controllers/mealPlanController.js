@@ -1,4 +1,3 @@
-// controllers/mealPlanController.js
 const MealPlan = require("../models/MealPlan");
 const Recipe = require("../models/Recipe");
 
@@ -25,7 +24,6 @@ exports.getMealPlanById = async (req, res) => {
 
 exports.createMealPlan = async (req, res) => {
   try {
-    // Accept either recipeIds or recipes from request body
     const recipeIds = req.body.recipeIds || req.body.recipes;
     const { mealType, date, notes } = req.body;
 
@@ -33,10 +31,10 @@ exports.createMealPlan = async (req, res) => {
       return res.status(400).json({ message: "You must provide at least one recipe ID" });
     }
 
-    // Verify all recipeIds exist
+    // Verify recipe IDs exist
     const recipesExist = await Recipe.find({ _id: { $in: recipeIds } });
     if (recipesExist.length !== recipeIds.length) {
-      return res.status(400).json({ message: "One or more recipeIds are invalid" });
+      return res.status(400).json({ message: "One or more recipe IDs are invalid" });
     }
 
     const newMealPlan = new MealPlan({
@@ -60,11 +58,16 @@ exports.updateMealPlan = async (req, res) => {
     const mealPlan = await MealPlan.findById(req.params.id);
     if (!mealPlan) return res.status(404).json({ message: "Meal plan not found" });
 
-    // Accept either recipeIds or recipes from request body
     const recipeIds = req.body.recipeIds || req.body.recipes;
     const { mealType, date, notes } = req.body;
 
-    if (recipeIds) mealPlan.recipeIds = recipeIds;
+    if (recipeIds) {
+      const recipesExist = await Recipe.find({ _id: { $in: recipeIds } });
+      if (recipesExist.length !== recipeIds.length) {
+        return res.status(400).json({ message: "One or more recipe IDs are invalid" });
+      }
+      mealPlan.recipeIds = recipeIds;
+    }
     if (mealType) mealPlan.mealType = mealType;
     if (date) mealPlan.date = date;
     if (notes) mealPlan.notes = notes;
@@ -83,7 +86,7 @@ exports.deleteMealPlan = async (req, res) => {
     if (!mealPlan) return res.status(404).json({ message: "Meal plan not found" });
 
     await mealPlan.remove();
-    res.json({ message: "Meal plan deleted" });
+    res.json({ message: "Meal plan deleted successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });

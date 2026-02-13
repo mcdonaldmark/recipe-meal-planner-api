@@ -2,7 +2,7 @@ const Recipe = require("../models/Recipe");
 
 const getAllRecipes = async (req, res) => {
   try {
-    const recipes = await Recipe.find();
+    const recipes = await Recipe.find().populate("tags");
     res.json(recipes);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -12,12 +12,9 @@ const getAllRecipes = async (req, res) => {
 const getRecipeById = async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id)
-      .populate({
-        path: "userId",
-        select: "firstName lastName email username locale -_id",
-      })
-      .populate({ path: "tagsId", select: "name description -_id" });
-      
+      .populate({ path: "userId", select: "firstName lastName email username locale -_id" })
+      .populate({ path: "tags", select: "name description -_id" });
+
     if (!recipe) return res.status(404).json({ message: "Recipe not found" });
     res.json(recipe);
   } catch (err) {
@@ -27,8 +24,7 @@ const getRecipeById = async (req, res) => {
 
 const createRecipe = async (req, res) => {
   try {
-    if (!req.user)
-      return res.status(401).json({ message: "You must be logged in" });
+    if (!req.user) return res.status(401).json({ message: "You must be logged in" });
 
     const { title, description, ingredients, steps, tags } = req.body;
 
@@ -50,33 +46,23 @@ const createRecipe = async (req, res) => {
 
 const updateRecipe = async (req, res) => {
   try {
-    if (!req.user)
-      return res.status(401).json({ message: "You must be logged in" }); 
+    if (!req.user) return res.status(401).json({ message: "You must be logged in" });
 
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) return res.status(404).json({ message: "Recipe not found" });
-
-    if (recipe.userId.toString() !== req.user.id) {
-      return res
-        .status(403)
-        .json({ message: "Not allowed to update this recipe" });
-    }
+    if (recipe.userId.toString() !== req.user.id)
+      return res.status(403).json({ message: "Not allowed to update this recipe" });
 
     const { title, description, ingredients, steps, tags } = req.body;
 
-    const updateData = {};
-    if (title) updateData.title = title;
-    if (description) updateData.description = description;
-    if (ingredients) updateData.ingredients = ingredients;
-    if (steps) updateData.steps = steps;
-    if (tags) updateData.tags = tags;
+    if (title) recipe.title = title;
+    if (description) recipe.description = description;
+    if (ingredients) recipe.ingredients = ingredients;
+    if (steps) recipe.steps = steps;
+    if (tags) recipe.tags = tags;
 
-    const updatedRecipe = await Recipe.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true },
-    );
-    res.json(updatedRecipe);
+    await recipe.save();
+    res.json(recipe);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -84,19 +70,14 @@ const updateRecipe = async (req, res) => {
 
 const deleteRecipe = async (req, res) => {
   try {
-    if (!req.user)
-      return res.status(401).json({ message: "You must be logged in" });
+    if (!req.user) return res.status(401).json({ message: "You must be logged in" });
 
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) return res.status(404).json({ message: "Recipe not found" });
+    if (recipe.userId.toString() !== req.user.id)
+      return res.status(403).json({ message: "Not allowed to delete this recipe" });
 
-    if (recipe.userId.toString() !== req.user.id) {
-      return res
-        .status(403)
-        .json({ message: "Not allowed to delete this recipe" });
-    }
-
-    await Recipe.findByIdAndDelete(req.params.id);
+    await recipe.remove();
     res.json({ message: "Recipe deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
