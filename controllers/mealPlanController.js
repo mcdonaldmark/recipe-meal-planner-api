@@ -1,93 +1,82 @@
-// controllers/mealPlanController.js
 const MealPlan = require("../models/MealPlan");
+const Recipe = require("../models/Recipe");
 
-const getMealPlanById = async (req, res) => {
+exports.getMealPlans = async (req, res) => {
   try {
-    const mealPlan = await MealPlan.findById(req.params.id)
-      .populate({ path: "recipeId", select: "title description -_id" });
-
-    if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
-
-    const mealPlanUserId = mealPlan.userId._id ? mealPlan.userId._id.toString() : mealPlan.userId.toString();
-    if (mealPlanUserId !== req.user.id) {
-      return res.status(403).json({ message: "Not allowed" });
-    }
-
-    res.json(mealPlan);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: err.message });
-  }
-};
-
-const getMealPlans = async (req, res) => {
-  try {
-    const mealPlans = await MealPlan.find({ userId: req.user.id })
-      .populate({ path: "recipeId", select: "title description -_id" });
-
+    const mealPlans = await MealPlan.find({ user: req.user.id }).populate("recipeIds");
     res.json(mealPlans);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-const createMealPlan = async (req, res) => {
+exports.getMealPlanById = async (req, res) => {
   try {
+    const mealPlan = await MealPlan.findById(req.params.id).populate("recipeIds");
+    if (!mealPlan) return res.status(404).json({ message: "Meal plan not found" });
+    res.json(mealPlan);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.createMealPlan = async (req, res) => {
+  try {
+    const { recipeIds, mealType, date, notes } = req.body;
+
+    // Optional: verify all recipeIds exist
+    const recipesExist = await Recipe.find({ _id: { $in: recipeIds } });
+    if (recipesExist.length !== recipeIds.length) {
+      return res.status(400).json({ message: "One or more recipeIds are invalid" });
+    }
+
     const newMealPlan = new MealPlan({
-      ...req.body,
-      userId: req.user.id,
+      user: req.user.id,
+      recipeIds,
+      mealType,
+      date,
+      notes,
     });
 
-    const savedMealPlan = await newMealPlan.save();
-    res.status(201).json(savedMealPlan);
+    await newMealPlan.save();
+    res.status(201).json(newMealPlan);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-const updateMealPlan = async (req, res) => {
+exports.updateMealPlan = async (req, res) => {
   try {
     const mealPlan = await MealPlan.findById(req.params.id);
-    if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
+    if (!mealPlan) return res.status(404).json({ message: "Meal plan not found" });
 
-    const mealPlanUserId = mealPlan.userId._id ? mealPlan.userId._id.toString() : mealPlan.userId.toString();
-    if (mealPlanUserId !== req.user.id) {
-      return res.status(403).json({ message: "Not allowed" });
-    }
+    const { recipeIds, mealType, date, notes } = req.body;
 
-    Object.assign(mealPlan, req.body);
-    const updatedMealPlan = await mealPlan.save();
-    res.json(updatedMealPlan);
+    if (recipeIds) mealPlan.recipeIds = recipeIds;
+    if (mealType) mealPlan.mealType = mealType;
+    if (date) mealPlan.date = date;
+    if (notes) mealPlan.notes = notes;
+
+    await mealPlan.save();
+    res.json(mealPlan);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-const deleteMealPlan = async (req, res) => {
+exports.deleteMealPlan = async (req, res) => {
   try {
     const mealPlan = await MealPlan.findById(req.params.id);
-    if (!mealPlan) return res.status(404).json({ message: "MealPlan not found" });
+    if (!mealPlan) return res.status(404).json({ message: "Meal plan not found" });
 
-    const mealPlanUserId = mealPlan.userId._id ? mealPlan.userId._id.toString() : mealPlan.userId.toString();
-    if (mealPlanUserId !== req.user.id) {
-      return res.status(403).json({ message: "Not allowed" });
-    }
-
-    await mealPlan.deleteOne();
-    res.json({ message: "MealPlan deleted" });
+    await mealPlan.remove();
+    res.json({ message: "Meal plan deleted" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Server error" });
   }
-};
-
-module.exports = {
-  getMealPlanById,
-  getMealPlans,
-  createMealPlan,
-  updateMealPlan,
-  deleteMealPlan,
 };

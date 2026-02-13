@@ -13,12 +13,19 @@ router.post(
   "/",
   ensureAuthenticated,
   [
-    body("recipeIds").isArray({ min: 1 }).withMessage("recipeIds must be an array with at least one item"),
-    body("mealType").notEmpty().withMessage("mealType is required"),
-    body("mealType").isIn(["breakfast", "lunch", "dinner", "snack"]).withMessage("mealType must be valid"),
+    body("recipeIds")
+      .isArray({ min: 1 })
+      .withMessage("recipeIds must be an array with at least one item"),
+    body("mealType")
+      .notEmpty()
+      .withMessage("mealType is required")
+      .isIn(["breakfast", "lunch", "dinner", "snack"])
+      .withMessage("mealType must be valid"),
     body("date").optional().isISO8601().toDate(),
     body("notes").optional().isString(),
-    body("recipeIds.*").isMongoId().withMessage("Each recipeId must be a valid Mongo ID"),
+    body("recipeIds.*")
+      .isMongoId()
+      .withMessage("Each recipeId must be a valid Mongo ID"),
   ],
   validate,
   mealPlanController.createMealPlan
