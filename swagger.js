@@ -48,13 +48,13 @@ const doc = {
               "properties": {
                 "title": { "example": "Weekly Plan" },
                 "description": { "example": "My weekly meal plan" },
-                "recipeIds": { 
-                  "type": "array", 
-                  "items": { "example": "64f8a0c1234567890abcdef" } 
+                "recipeIds": {
+                  "type": "array",
+                  "items": { "example": "recipeId123" }
                 },
-                "mealType": { 
-                  "example": "lunch", 
-                  "enum": ["breakfast", "lunch", "dinner", "snack"] 
+                "mealType": {
+                  "example": "lunch",
+                  "enum": ["breakfast", "lunch", "dinner", "snack"]
                 },
                 "startDate": { "example": "2026-02-12" },
                 "endDate": { "example": "2026-02-18" }
@@ -101,17 +101,18 @@ const doc = {
               "properties": {
                 "title": { "example": "Updated Plan" },
                 "description": { "example": "Updated description" },
-                "recipeIds": { 
-                  "type": "array", 
-                  "items": { "example": "64f8a0c1234567890abcdef" } 
+                "recipeIds": {
+                  "type": "array",
+                  "items": { "example": "recipeId456" }
                 },
-                "mealType": { 
-                  "example": "dinner", 
-                  "enum": ["breakfast", "lunch", "dinner", "snack"] 
+                "mealType": {
+                  "example": "dinner",
+                  "enum": ["breakfast", "lunch", "dinner", "snack"]
                 },
                 "startDate": { "example": "2026-02-15" },
                 "endDate": { "example": "2026-02-21" }
-              }
+              },
+              "required": ["recipeIds", "mealType"]
             }
           }
         ],
@@ -240,7 +241,7 @@ const outputFile = './swagger.json';
 const endpointsFiles = [
   './routes/recipes.js',
   './routes/users.js',
-  './routes/mealplans.js',
+  './routes/mealplan.js',
   './routes/tags.js'
 ];
 
