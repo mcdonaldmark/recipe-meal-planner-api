@@ -15,11 +15,16 @@ const recipeSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Tag",
-        required: true,
       },
     ],
+    cookingTime: { type: Number }, // in minutes
+    difficulty: {
+      type: String,
+      enum: ["easy", "medium", "hard"],
+    },
+    servings: { type: Number },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Recipe", recipeSchema);

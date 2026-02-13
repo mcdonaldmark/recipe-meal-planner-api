@@ -17,7 +17,7 @@ const getRecipeById = async (req, res) => {
         select: "firstName lastName email username locale -_id",
       })
       .populate({ path: "tagsId", select: "name description -_id" });
-      
+
     if (!recipe) return res.status(404).json({ message: "Recipe not found" });
     res.json(recipe);
   } catch (err) {
@@ -30,7 +30,7 @@ const createRecipe = async (req, res) => {
     if (!req.user)
       return res.status(401).json({ message: "You must be logged in" });
 
-    const { title, description, ingredients, steps, tags } = req.body;
+    const { title, description, ingredients, steps, tags, cookingTime, difficulty, servings } = req.body;
 
     const recipe = new Recipe({
       userId: req.user.id,
@@ -38,7 +38,10 @@ const createRecipe = async (req, res) => {
       description,
       ingredients,
       steps,
-      tags,
+      tagsId: tags,
+      cookingTime,
+      difficulty,
+      servings,
     });
 
     await recipe.save();
@@ -51,7 +54,7 @@ const createRecipe = async (req, res) => {
 const updateRecipe = async (req, res) => {
   try {
     if (!req.user)
-      return res.status(401).json({ message: "You must be logged in" }); 
+      return res.status(401).json({ message: "You must be logged in" });
 
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) return res.status(404).json({ message: "Recipe not found" });
@@ -62,19 +65,22 @@ const updateRecipe = async (req, res) => {
         .json({ message: "Not allowed to update this recipe" });
     }
 
-    const { title, description, ingredients, steps, tags } = req.body;
+    const { title, description, ingredients, steps, tags, cookingTime, difficulty, servings } = req.body;
 
     const updateData = {};
     if (title) updateData.title = title;
     if (description) updateData.description = description;
     if (ingredients) updateData.ingredients = ingredients;
     if (steps) updateData.steps = steps;
-    if (tags) updateData.tags = tags;
+    if (tags) updateData.tagsId = tags;
+    if (cookingTime !== undefined) updateData.cookingTime = cookingTime;
+    if (difficulty) updateData.difficulty = difficulty;
+    if (servings !== undefined) updateData.servings = servings;
 
     const updatedRecipe = await Recipe.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true },
+      { new: true }
     );
     res.json(updatedRecipe);
   } catch (err) {
