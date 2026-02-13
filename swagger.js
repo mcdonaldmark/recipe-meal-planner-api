@@ -11,7 +11,7 @@ const doc = {
   securityDefinitions: {
     googleOAuth: {
       type: 'oauth2',
-      authorizationUrl: 'http://localhost:3000/auth/google',
+      authorizationUrl: 'https://recipe-meal-planner-api-nooc.onrender.com/auth/google',
       flow: 'implicit',
       scopes: {}
     }
