@@ -1,6 +1,6 @@
 const MealPlan = require("../models/MealPlan");
-const Recipe = require("../models/recipes"); // adjust path if needed
-const User = require("../models/users");
+const Recipe = require("../models/Recipe"); // adjust path if needed
+const User = require("../models/User");
 
 // ------------------- GET ALL MEAL PLANS -------------------
 const getAllMealPlans = async (req, res) => {
