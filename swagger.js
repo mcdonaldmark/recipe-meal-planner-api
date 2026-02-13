@@ -17,7 +17,7 @@ const doc = {
     }
   },
   paths: {
-    "/users": { },
+    "/users": {},
     "/users/{id}": {},
     "/recipes": {},
     "/recipes/{id}": {},
@@ -48,10 +48,18 @@ const doc = {
               "properties": {
                 "title": { "example": "Weekly Plan" },
                 "description": { "example": "My weekly meal plan" },
-                "recipes": { "type": "array", "items": { "example": "recipeId123" } },
+                "recipeIds": { 
+                  "type": "array", 
+                  "items": { "example": "64f8a0c1234567890abcdef" } 
+                },
+                "mealType": { 
+                  "example": "lunch", 
+                  "enum": ["breakfast", "lunch", "dinner", "snack"] 
+                },
                 "startDate": { "example": "2026-02-12" },
                 "endDate": { "example": "2026-02-18" }
-              }
+              },
+              "required": ["recipeIds", "mealType"]
             }
           }
         ],
@@ -63,6 +71,7 @@ const doc = {
         }
       }
     },
+
     "/mealplans/{id}": {
       "get": {
         "tags": ["MealPlans"],
@@ -92,7 +101,14 @@ const doc = {
               "properties": {
                 "title": { "example": "Updated Plan" },
                 "description": { "example": "Updated description" },
-                "recipes": { "type": "array", "items": { "example": "recipeId456" } },
+                "recipeIds": { 
+                  "type": "array", 
+                  "items": { "example": "64f8a0c1234567890abcdef" } 
+                },
+                "mealType": { 
+                  "example": "dinner", 
+                  "enum": ["breakfast", "lunch", "dinner", "snack"] 
+                },
                 "startDate": { "example": "2026-02-15" },
                 "endDate": { "example": "2026-02-21" }
               }
