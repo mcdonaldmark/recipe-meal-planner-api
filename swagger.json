@@ -392,7 +392,7 @@
                 "properties":{
                   "id":{"example":"tagId123"},
                   "name":{"example":"Italian"},
-                  "color":{"example":"#FF0000"}
+                  "description":{"example":"Traditional Italian cuisine"}
                 }
               }
             }
@@ -409,7 +409,7 @@
           {"name":"body","in":"body","required":true,
            "schema":{"type":"object","properties":{
              "name":{"example":"Italian"},
-             "color":{"example":"#FF0000"}
+             "description":{"example":"Traditional Italian cuisine"}
            },"required":["name"]}}
         ],
         "responses":{
@@ -430,7 +430,7 @@
             "schema":{"type":"object","properties":{
               "id":{"example":"tagId123"},
               "name":{"example":"Italian"},
-              "color":{"example":"#FF0000"}
+              "description":{"example":"Traditional Italian cuisine"}
             }}
           },
           "401":{"description":"Unauthorized"},
@@ -447,7 +447,7 @@
           {"name":"body","in":"body","required":true,
            "schema":{"type":"object","properties":{
              "name":{"example":"Updated Tag"},
-             "color":{"example":"#00FF00"}
+             "description":{"example":"Traditional Italian cuisine"}
            }}}
         ],
         "responses":{
