@@ -224,7 +224,7 @@ const outputFile = './swagger.json';
 const endpointsFiles = [
   './routes/recipes.js',
   './routes/users.js',
-  './routes/mealplans.js',
+  './routes/mealPlan.js',
   './routes/tags.js'
 ];
 
