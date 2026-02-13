@@ -100,7 +100,7 @@ const doc = {
       },
       post: {
         tags: ["MealPlans"],
-        description: "Create a new meal plan (Google login required) - single recipeId",
+        description: "Create a new meal plan (single recipeId, Google login required)",
         consumes: ["application/json"],
         security: [{ "googleOAuth": [] }],
         parameters: [
@@ -111,9 +111,8 @@ const doc = {
             schema: {
               type: "object",
               properties: {
-                userId: { example: "userId123" },
                 recipeId: { type: "string", example: "recipeId123", description: "Single recipe ID" },
-                date: { example: "2026-02-12T00:00:00Z" },
+                date: { type: "string", format: "date", example: "2026-02-12" },
                 mealType: { example: "lunch", enum: ["breakfast", "lunch", "dinner", "snack"] },
                 notes: { example: "Extra veggies" }
               },
@@ -157,9 +156,8 @@ const doc = {
             schema: {
               type: "object",
               properties: {
-                userId: { example: "userId123" },
-                recipeId: { example: "recipeId456" },
-                date: { example: "2026-02-15T00:00:00Z" },
+                recipeId: { type: "string", example: "recipeId456" },
+                date: { type: "string", format: "date", example: "2026-02-15" },
                 mealType: { example: "dinner", enum: ["breakfast", "lunch", "dinner", "snack"] },
                 notes: { example: "Add extra sauce" }
               },
