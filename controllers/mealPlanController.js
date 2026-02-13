@@ -1,13 +1,14 @@
-const MealPlan = require("../models/mealplan");
-const Recipe = require("../models/recipes"); // ensure path is correct
+const MealPlan = require("../models/MealPlan");
+const Recipe = require("../models/recipes"); // adjust path if needed
 const User = require("../models/users");
 
 // ------------------- GET ALL MEAL PLANS -------------------
 const getAllMealPlans = async (req, res) => {
   try {
     const mealPlans = await MealPlan.find()
-      .populate("recipeId", "title ingredients cookingTime difficulty") // populate recipe
-      .populate("userId", "firstName lastName email"); // optional: populate user
+      .populate("recipeId", "title ingredients cookingTime difficulty") // populate recipe fields
+      .populate("userId", "firstName lastName email"); // populate user info
+
     res.status(200).json(mealPlans);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -21,9 +22,7 @@ const getMealPlanById = async (req, res) => {
       .populate("recipeId", "title ingredients cookingTime difficulty")
       .populate("userId", "firstName lastName email");
 
-    if (!mealPlan) {
-      return res.status(404).json({ message: "Meal plan not found" });
-    }
+    if (!mealPlan) return res.status(404).json({ message: "Meal plan not found" });
 
     res.status(200).json(mealPlan);
   } catch (err) {
@@ -36,12 +35,11 @@ const createMealPlan = async (req, res) => {
   try {
     const { userId, recipeId, date, mealType, notes } = req.body;
 
-    // Validate required fields
     if (!userId || !recipeId || !mealType) {
       return res.status(400).json({ message: "userId, recipeId, and mealType are required" });
     }
 
-    // Optional: Check if user and recipe exist
+    // Validate existence of user and recipe
     const user = await User.findById(userId);
     const recipe = await Recipe.findById(recipeId);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -57,8 +55,8 @@ const createMealPlan = async (req, res) => {
 
     const savedMealPlan = await mealPlan.save();
 
-    // Populate before returning
-    await savedMealPlan.populate("recipeId", "title ingredients cookingTime difficulty")
+    await savedMealPlan
+      .populate("recipeId", "title ingredients cookingTime difficulty")
       .populate("userId", "firstName lastName email");
 
     res.status(201).json(savedMealPlan);
@@ -76,7 +74,6 @@ const updateMealPlan = async (req, res) => {
     const mealPlan = await MealPlan.findById(id);
     if (!mealPlan) return res.status(404).json({ message: "Meal plan not found" });
 
-    // Update fields if provided
     if (recipeId) {
       const recipe = await Recipe.findById(recipeId);
       if (!recipe) return res.status(404).json({ message: "Recipe not found" });
@@ -88,7 +85,8 @@ const updateMealPlan = async (req, res) => {
 
     const updatedMealPlan = await mealPlan.save();
 
-    await updatedMealPlan.populate("recipeId", "title ingredients cookingTime difficulty")
+    await updatedMealPlan
+      .populate("recipeId", "title ingredients cookingTime difficulty")
       .populate("userId", "firstName lastName email");
 
     res.status(200).json(updatedMealPlan);
